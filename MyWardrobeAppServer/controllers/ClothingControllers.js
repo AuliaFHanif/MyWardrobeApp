@@ -24,34 +24,35 @@ class Clothing {
           {
             model: ClothingType,
             as: "type",
-            attributes: ["type_name", "category"], // Only get these fields
+            attributes: ["type_name", "category"]
           },
           {
             model: Brand,
             as: "brand",
-            attributes: ["brand_name"],
+            attributes: ["brand_name"]
           },
           {
             model: Color,
             as: "color",
-            attributes: ["color_name", "hex_code"],
+            attributes: ["color_name", "hex_code"]
           },
           {
             model: User,
             as: "user",
-            attributes: ["first_name", "last_name", "email"],
+            attributes: ["first_name", "last_name"]
           },
           {
             model: Occasion,
             as: "occasions",
             attributes: ["occasion_name"],
-            through: { attributes: [] }, // Don't include junction table data
-          },
-        ],
+            through: { attributes: [] }
+          }
+        ]
       });
       res.status(200).json(clothingItems);
     } catch (error) {
       console.log(error);
+      res.status(500).json({ error: error.message });
     }
   }
 
