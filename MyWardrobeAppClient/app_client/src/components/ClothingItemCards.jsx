@@ -41,34 +41,16 @@ export default function ClothingItemCards( items) {
                     whiteSpace: "nowrap",
                     color: "#333"
                 }}>
-                    {items.items.brand.brand_name}
-                </h5>
-                <p className="text-muted mb-2" style={{
-                    fontSize: "0.85rem",
-                    height: "2.6rem",
-                    overflow: "hidden",
-                    display: "-webkit-box",
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: "vertical",
-                    lineHeight: "1.3"
-                }}>
-                    {items.items.material}
-                    <br />
                     {items.items.type.type_name}
                     <br />
                     {items.items.type.category}
                     <br />
+                    {items.items.brand.brand_name}
+                    <br />
                     {items.items.color.color_name}
-                </p>
-                <span className="badge mb-3" style={{
-                    fontSize: "0.75rem",
-                    width: "fit-content",
-                    backgroundColor: "#6c757d",
-                    padding: "0.25rem 0.7rem"
-                }}>
-                    {items.items.material}
-                </span>
-
+                    <br />
+                    
+                </h5>
                 <div className="mt-auto d-flex gap-2">
                     <button
                         onClick={() => navigate(`/cuisinedetails/${item.id}`)}

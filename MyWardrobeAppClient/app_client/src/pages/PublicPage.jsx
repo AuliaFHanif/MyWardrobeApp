@@ -9,7 +9,7 @@ function PublicPage() {
     const [categoryFilter, setCategoryFilter] = useState("")
     const [sortOrder, setSortOrder] = useState("DESC")
     const [currentPage, setCurrentPage] = useState(1)
-    const itemsPerPage = 10
+    const itemsPerPage = 12
 
     const fetchData = async (search = "", category = "", sort = "DESC", page = 1) => {
         try {
@@ -24,6 +24,7 @@ function PublicPage() {
             if (category) params.category = category
 
             const { data } = await phase2Api.get('/pub/clothingItems', {
+                params: params,
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("access_token")}`
                 }

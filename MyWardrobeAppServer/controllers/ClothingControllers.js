@@ -18,36 +18,39 @@ cloudinary.config({
 class Clothing {
   static async getClothingItemPublic(req, res, next) {
     try {
-      const clothingItems = await ClothingItem.findAll({
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 12;
+      const offset = (page - 1) * limit;
+      const clothingItems = await ClothingItem.findAll({limit, offset,
         attributes: { exclude: ["user_id", "brand_id", "type_id", "color_id"] },
         include: [
           {
             model: ClothingType,
             as: "type",
-            attributes: ["type_name", "category"]
+            attributes: ["type_name", "category"],
           },
           {
             model: Brand,
             as: "brand",
-            attributes: ["brand_name"]
+            attributes: ["brand_name"],
           },
           {
             model: Color,
             as: "color",
-            attributes: ["color_name", "hex_code"]
+            attributes: ["color_name", "hex_code"],
           },
           {
             model: User,
             as: "user",
-            attributes: ["first_name", "last_name"]
+            attributes: ["first_name", "last_name"],
           },
           {
             model: Occasion,
             as: "occasions",
             attributes: ["occasion_name"],
-            through: { attributes: [] }
-          }
-        ]
+            through: { attributes: [] },
+          },
+        ],
       });
       res.status(200).json(clothingItems);
     } catch (error) {
