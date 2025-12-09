@@ -1,0 +1,174 @@
+[
+    {
+      "type_name": "T-Shirt",
+      "category": "Tops"
+    },
+    {
+      "type_name": "Shirt",
+      "category": "Tops"
+    },
+    {
+      "type_name": "Polo Shirt",
+      "category": "Tops"
+    },
+    {
+      "type_name": "Blouse",
+      "category": "Tops"
+    },
+    {
+      "type_name": "Tank Top",
+      "category": "Tops"
+    },
+    {
+      "type_name": "Sweater",
+      "category": "Tops"
+    },
+    {
+      "type_name": "Hoodie",
+      "category": "Tops"
+    },
+    {
+      "type_name": "Cardigan",
+      "category": "Tops"
+    },
+    {
+      "type_name": "Jeans",
+      "category": "Bottoms"
+    },
+    {
+      "type_name": "Pants",
+      "category": "Bottoms"
+    },
+    {
+      "type_name": "Shorts",
+      "category": "Bottoms"
+    },
+    {
+      "type_name": "Skirt",
+      "category": "Bottoms"
+    },
+    {
+      "type_name": "Leggings",
+      "category": "Bottoms"
+    },
+    {
+      "type_name": "Chinos",
+      "category": "Bottoms"
+    },
+    {
+      "type_name": "Dress Pants",
+      "category": "Bottoms"
+    },
+    {
+      "type_name": "Dress",
+      "category": "Dresses"
+    },
+    {
+      "type_name": "Maxi Dress",
+      "category": "Dresses"
+    },
+    {
+      "type_name": "Midi Dress",
+      "category": "Dresses"
+    },
+    {
+      "type_name": "Mini Dress",
+      "category": "Dresses"
+    },
+    {
+      "type_name": "Jacket",
+      "category": "Outerwear"
+    },
+    {
+      "type_name": "Coat",
+      "category": "Outerwear"
+    },
+    {
+      "type_name": "Blazer",
+      "category": "Outerwear"
+    },
+    {
+      "type_name": "Windbreaker",
+      "category": "Outerwear"
+    },
+    {
+      "type_name": "Parka",
+      "category": "Outerwear"
+    },
+    {
+      "type_name": "Suit",
+      "category": "Formalwear"
+    },
+    {
+      "type_name": "Tuxedo",
+      "category": "Formalwear"
+    },
+    {
+      "type_name": "Sneakers",
+      "category": "Footwear"
+    },
+    {
+      "type_name": "Boots",
+      "category": "Footwear"
+    },
+    {
+      "type_name": "Sandals",
+      "category": "Footwear"
+    },
+    {
+      "type_name": "Heels",
+      "category": "Footwear"
+    },
+    {
+      "type_name": "Flats",
+      "category": "Footwear"
+    },
+    {
+      "type_name": "Dress Shoes",
+      "category": "Footwear"
+    },
+    {
+      "type_name": "Swimsuit",
+      "category": "Swimwear"
+    },
+    {
+      "type_name": "Swim Trunks",
+      "category": "Swimwear"
+    },
+    {
+      "type_name": "Bikini",
+      "category": "Swimwear"
+    },
+    {
+      "type_name": "Activewear Top",
+      "category": "Activewear"
+    },
+    {
+      "type_name": "Activewear Bottoms",
+      "category": "Activewear"
+    },
+    {
+      "type_name": "Sports Bra",
+      "category": "Activewear"
+    },
+    {
+      "type_name": "Scarf",
+      "category": "Accessories"
+    },
+    {
+      "type_name": "Hat",
+      "category": "Accessories"
+    },
+    {
+      "type_name": "Belt",
+      "category": "Accessories"
+    },
+    {
+      "type_name": "Tie",
+      "category": "Accessories"
+    },
+    {
+      "type_name": "Bow Tie",
+      "category": "Accessories"
+    }
+  ]

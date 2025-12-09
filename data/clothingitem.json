@@ -1,0 +1,222 @@
+[
+    {
+      "user_id": 1,
+      "brand_id": 1,
+      "type_id": 1,
+      "color_id": 1,
+      "size": "M",
+      "material": "Cotton",
+      "last_used": "2024-12-01",
+      "image_url": null,
+      "notes": "Comfortable everyday t-shirt"
+    },
+    {
+      "user_id": 1,
+      "brand_id": 4,
+      "type_id": 9,
+      "color_id": 14,
+      "size": "32",
+      "material": "Denim",
+      "last_used": "2024-11-28",
+      "image_url": null,
+      "notes": "Favorite jeans"
+    },
+    {
+      "user_id": 1,
+      "brand_id": 10,
+      "type_id": 20,
+      "color_id": 34,
+      "size": "L",
+      "material": "Polyester",
+      "last_used": null,
+      "image_url": null,
+      "notes": "Outdoor hiking jacket"
+    },
+    {
+      "user_id": 2,
+      "brand_id": 17,
+      "type_id": 3,
+      "color_id": 2,
+      "size": "L",
+      "material": "Cotton Blend",
+      "last_used": "2024-12-05",
+      "image_url": null,
+      "notes": "Work polo shirt"
+    },
+    {
+      "user_id": 2,
+      "brand_id": 14,
+      "type_id": 9,
+      "color_id": 14,
+      "size": "34",
+      "material": "Denim",
+      "last_used": "2024-12-04",
+      "image_url": null,
+      "notes": "Classic blue jeans"
+    },
+    {
+      "user_id": 2,
+      "brand_id": 22,
+      "type_id": 27,
+      "color_id": 1,
+      "size": "43",
+      "material": "Leather",
+      "last_used": "2024-12-06",
+      "image_url": null,
+      "notes": "Formal dress shoes"
+    },
+    {
+      "user_id": 3,
+      "brand_id": 7,
+      "type_id": 4,
+      "color_id": 31,
+      "size": "S",
+      "material": "Silk Blend",
+      "last_used": "2024-11-30",
+      "image_url": null,
+      "notes": "Pink blouse for parties"
+    },
+    {
+      "user_id": 3,
+      "brand_id": 3,
+      "type_id": 16,
+      "color_id": 1,
+      "size": "S",
+      "material": "Polyester",
+      "last_used": "2024-12-02",
+      "image_url": null,
+      "notes": "Little black dress"
+    },
+    {
+      "user_id": 3,
+      "brand_id": 31,
+      "type_id": 27,
+      "color_id": 2,
+      "size": "38",
+      "material": "Mesh",
+      "last_used": "2024-12-07",
+      "image_url": null,
+      "notes": "Running sneakers"
+    },
+    {
+      "user_id": 3,
+      "brand_id": 20,
+      "type_id": 12,
+      "color_id": 11,
+      "size": "M",
+      "material": "Cotton",
+      "last_used": "2024-11-25",
+      "image_url": null,
+      "notes": "Summer skirt"
+    },
+    {
+      "user_id": 4,
+      "brand_id": 32,
+      "type_id": 1,
+      "color_id": 6,
+      "size": "M",
+      "material": "Cotton",
+      "last_used": "2024-12-08",
+      "image_url": null,
+      "notes": "Red casual t-shirt"
+    },
+    {
+      "user_id": 4,
+      "brand_id": 5,
+      "type_id": 11,
+      "color_id": 1,
+      "size": "30",
+      "material": "Cotton",
+      "last_used": "2024-12-07",
+      "image_url": null,
+      "notes": "Black shorts"
+    },
+    {
+      "user_id": 4,
+      "brand_id": 33,
+      "type_id": 27,
+      "color_id": 2,
+      "size": "42",
+      "material": "Synthetic",
+      "last_used": "2024-12-09",
+      "image_url": null,
+      "notes": "Soccer cleats"
+    },
+    {
+      "user_id": 4,
+      "brand_id": 10,
+      "type_id": 7,
+      "color_id": 3,
+      "size": "L",
+      "material": "Cotton Blend",
+      "last_used": "2024-11-20",
+      "image_url": null,
+      "notes": "Gray hoodie"
+    },
+    {
+      "user_id": 1,
+      "brand_id": 2,
+      "type_id": 2,
+      "color_id": 2,
+      "size": "M",
+      "material": "Cotton",
+      "last_used": "2024-11-15",
+      "image_url": null,
+      "notes": "White formal shirt"
+    },
+    {
+      "user_id": 2,
+      "brand_id": 11,
+      "type_id": 23,
+      "color_id": 1,
+      "size": "L",
+      "material": "Nylon",
+      "last_used": null,
+      "image_url": null,
+      "notes": "Windbreaker for jogging"
+    },
+    {
+      "user_id": 3,
+      "brand_id": 21,
+      "type_id": 8,
+      "color_id": 10,
+      "size": "M",
+      "material": "Wool",
+      "last_used": "2024-11-18",
+      "image_url": null,
+      "notes": "Burgundy cardigan"
+    },
+    {
+      "user_id": 3,
+      "brand_id": 26,
+      "type_id": 29,
+      "color_id": 37,
+      "size": "38",
+      "material": "Canvas",
+      "last_used": "2024-12-03",
+      "image_url": null,
+      "notes": "Tan sandals"
+    },
+    {
+      "user_id": 4,
+      "brand_id": 35,
+      "type_id": 36,
+      "color_id": 1,
+      "size": "M",
+      "material": "Polyester",
+      "last_used": "2024-12-05",
+      "image_url": null,
+      "notes": "Athletic workout top"
+    },
+    {
+      "user_id": 2,
+      "brand_id": 18,
+      "type_id": 22,
+      "color_id": 14,
+      "size": "L",
+      "material": "Wool Blend",
+      "last_used": "2024-10-20",
+      "image_url": null,
+      "notes": "Navy blue blazer for presentations"
+    }
+  ]

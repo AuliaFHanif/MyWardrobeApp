@@ -1,0 +1,138 @@
+[
+    {
+      "item_id": 1,
+      "occasion_id": 1
+    },
+    {
+      "item_id": 2,
+      "occasion_id": 1
+    },
+    {
+      "item_id": 3,
+      "occasion_id": 8
+    },
+    {
+      "item_id": 4,
+      "occasion_id": 3
+    },
+    {
+      "item_id": 4,
+      "occasion_id": 4
+    },
+    {
+      "item_id": 5,
+      "occasion_id": 1
+    },
+    {
+      "item_id": 5,
+      "occasion_id": 4
+    },
+    {
+      "item_id": 6,
+      "occasion_id": 2
+    },
+    {
+      "item_id": 6,
+      "occasion_id": 3
+    },
+    {
+      "item_id": 7,
+      "occasion_id": 5
+    },
+    {
+      "item_id": 7,
+      "occasion_id": 6
+    },
+    {
+      "item_id": 8,
+      "occasion_id": 2
+    },
+    {
+      "item_id": 8,
+      "occasion_id": 5
+    },
+    {
+      "item_id": 8,
+      "occasion_id": 6
+    },
+    {
+      "item_id": 9,
+      "occasion_id": 7
+    },
+    {
+      "item_id": 10,
+      "occasion_id": 1
+    },
+    {
+      "item_id": 10,
+      "occasion_id": 9
+    },
+    {
+      "item_id": 11,
+      "occasion_id": 1
+    },
+    {
+      "item_id": 12,
+      "occasion_id": 1
+    },
+    {
+      "item_id": 12,
+      "occasion_id": 7
+    },
+    {
+      "item_id": 13,
+      "occasion_id": 7
+    },
+    {
+      "item_id": 14,
+      "occasion_id": 1
+    },
+    {
+      "item_id": 14,
+      "occasion_id": 10
+    },
+    {
+      "item_id": 15,
+      "occasion_id": 2
+    },
+    {
+      "item_id": 15,
+      "occasion_id": 3
+    },
+    {
+      "item_id": 16,
+      "occasion_id": 7
+    },
+    {
+      "item_id": 16,
+      "occasion_id": 8
+    },
+    {
+      "item_id": 17,
+      "occasion_id": 1
+    },
+    {
+      "item_id": 17,
+      "occasion_id": 4
+    },
+    {
+      "item_id": 18,
+      "occasion_id": 1
+    },
+    {
+      "item_id": 18,
+      "occasion_id": 9
+    },
+    {
+      "item_id": 19,
+      "occasion_id": 7
+    },
+    {
+      "item_id": 20,
+      "occasion_id": 3
+    },
+    {
+      "item_id": 20,
+      "occasion_id": 2
+    }
+  ]
