@@ -13,7 +13,6 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'ClothingItemOccasion',
-    underscored: true
   });
   return ClothingItemOccasion;
 };
