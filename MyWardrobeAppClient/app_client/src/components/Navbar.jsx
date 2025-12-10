@@ -50,6 +50,11 @@ export default function Navbar() {
                                 My Clothing Items
                             </Link>
                         </li>
+                        <li className="nav-item">
+                            <Link className="nav-link fw-semibold" aria-current="page" to="/clothingItems/myItems/add" style={{ color: '#6B3410' }}>
+                                Add Clothing Item
+                            </Link>
+                        </li>
                     </ul>
                     {isAuthenticated ? (
                         <button

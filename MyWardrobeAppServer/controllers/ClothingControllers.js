@@ -1,7 +1,15 @@
-const {ClothingItem,ClothingType,Brand,Color,User,Occasion,} = require("../models");
+const {
+  ClothingItem,
+  ClothingType,
+  Brand,
+  Color,
+  User,
+  Occasion,
+} = require("../models");
 // No name search required; keep imports minimal
 const { v2: cloudinary } = require("cloudinary");
 const { verifyToken } = require("../helpers/jwt");
+const { where } = require("sequelize");
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -83,7 +91,6 @@ class Clothing {
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 12;
       const offset = (page - 1) * limit;
-      
 
       const clothingItems = await ClothingItem.findAll({
         limit,
@@ -137,28 +144,22 @@ class Clothing {
     try {
       const id = req.params.id;
       const itemDetails = await ClothingItem.findByPk(id, {
-       attributes: { exclude: ["user_id", "brand_id", "type_id", "color_id"] },
+        attributes: { exclude: ["user_id", "brand_id", "type_id", "color_id"] },
         include: [
           {
             model: ClothingType,
             as: "type",
             attributes: ["type_name", "category"],
-            where: category ? { category: category } : undefined,
-            required: !!category,
           },
           {
             model: Brand,
             as: "brand",
             attributes: ["brand_name"],
-            where: brand_id ? { id: brand_id } : undefined,
-            required: !!brand_id,
           },
           {
             model: Color,
             as: "color",
             attributes: ["color_name", "hex_code"],
-            where: color_id ? { id: color_id } : undefined,
-            required: !!color_id,
           },
           {
             model: User,
@@ -179,17 +180,86 @@ class Clothing {
 
   static async addClothingItem(req, res, next) {
     try {
-    } catch (error) {}
+      const {
+        type_id,
+        brand_id,
+        color_id,
+        size,
+        material,
+        last_used,
+        image_url,
+      } = req.body;
+      const bearerToken = req.headers.authorization;
+      const accessToken = bearerToken.split(" ")[1];
+      const data = verifyToken(accessToken);
+      await ClothingItem.create({
+        user_id: data.id,
+        type_id,
+        brand_id,
+        color_id,
+        size,
+        material,
+        last_used,
+        image_url,
+      });
+      res.status(201).json({ message: "Clothing item added successfully" });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: error.message });
+    }
   }
 
   static async editClothingItem(req, res, next) {
     try {
-    } catch (error) {}
+      const itemId = req.params.id;
+      const {
+        type_id,
+        brand_id,
+        color_id,
+        size,
+        material,
+        last_used,
+        image_url,
+      } = req.body;
+      const bearerToken = req.headers.authorization;
+      const accessToken = bearerToken.split(" ")[1];
+      const data = verifyToken(accessToken);
+      await ClothingItem.update({where: { id: itemId}}, {
+        user_id: data.id,
+        type_id,
+        brand_id,
+        color_id,
+        size,
+        material,
+        last_used,
+        image_url,
+      });
+      res.status(201).json({ message: "Clothing item added successfully" });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: error.message });
+    }
   }
 
   static async deleteClothingItem(req, res, next) {
     try {
-    } catch (error) {}
+            const clothingItemId = +req.params.id;
+            const clothingItem = await ClothingItem.findByPk(clothingItemId);
+            if (req.user.role !== "Admin" && clothingItem.authorId !== req.user.id) {
+                throw { name: "Unauthorized", message: "You are not authorized to delete this clothing item" };
+            }
+            if (!clothingItem) {
+                res.status(404).json({ message: `Clothing item not found` });
+                return;
+            }
+
+            await clothingItem.destroy();
+            res.status(200).json({ message: `Item deleted successfully` });
+        } catch (error) {
+
+            next(error)
+
+        }
   }
 
   static async editClothingItemImage(req, res, next) {}

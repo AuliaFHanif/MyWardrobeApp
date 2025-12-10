@@ -6,6 +6,7 @@ const Clothing = require('./controllers/ClothingControllers.js');
 const Users = require('./controllers/UserControllers.js');
 const Brand = require('./controllers/BrandController.js');
 const Color = require('./controllers/ColorController.js');
+const Types = require('./controllers/TypeController.js');
 const authentication = require('./middlewares/authentication.js')
 const verifyRole = require('./middlewares/authorization.js')
 const errorHandler = require('./middlewares/errorHandler.js')
@@ -23,8 +24,9 @@ app.use(express.json());
 
 app.get('/pub/clothingItems', Clothing.getClothingItemPublic);
 app.get('/clothingItems/:id', Clothing.getClothingItemDetail);
-app.get('/pub/brands', Brand.getAllBrands);
-app.get('/pub/colors', Color.getAllColors);
+app.get('/brands', Brand.getAllBrands);
+app.get('/colors', Color.getAllColors);
+app.get('/types', Types.getAllTypes);
 
 
 app.post('/login', Users.login)

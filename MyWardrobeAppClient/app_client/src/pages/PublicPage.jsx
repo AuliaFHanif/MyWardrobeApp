@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import ClothingItemCards from '../components/ClothingItemCards'
+import PublicItemCards from '../components/PublicItemCards.jsx'
 import { phase2Api } from '../helpers/http.client'
 import Search from '../components/Search'
 
@@ -84,7 +84,7 @@ function PublicPage() {
                         {items.length > 0 ? (
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', justifyContent: 'flex-start' }}>
                                 {items.map((item) =>
-                                    <ClothingItemCards key={item.id} items={item} />)}
+                                    <PublicItemCards key={item.id} items={item} />)}
                             </div>
                         ) : (
                             <p className="text-center text-muted">No clothing items found</p>

@@ -5,6 +5,7 @@ import Navbar from "./components/Navbar.jsx";
 import PublicClothingItems from "./pages/PublicPage.jsx";
 import ItemDetails from "./pages/PublicDetailPage.jsx";
 import UserClothingItems from "./pages/UserClothingItems.jsx";
+import AddItem from "./pages/CreateClothingItem.jsx";
 
 
 
@@ -57,6 +58,7 @@ function App() {
 
         <Route element={<ProtectedLayout />}>
           <Route path="/clothingItems/myItems" element={<UserClothingItems />} />
+          <Route path="/clothingItems/myItems/add" element={<AddItem />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router"
 
-export default function ClothingItemCards( items) {
+export default function PublicItemCards( items) {
     const navigate = useNavigate()
-    console.log(items.items);
+    console.log(items.items.id);
     
     return (
         <div className="card" style={{
@@ -54,7 +54,7 @@ export default function ClothingItemCards( items) {
                 </h5>
                 <div className="mt-auto d-flex gap-2">
                     <button
-                        onClick={() => navigate(`/cuisinedetails/${item.id}`)}
+                        onClick={() => navigate(`/clothingItems/${items.items.id}`)}
                         className="btn btn-warning flex-fill"
                         style={{ fontSize: "0.875rem", fontWeight: "500", padding: "0.5rem" }}>
                         Details

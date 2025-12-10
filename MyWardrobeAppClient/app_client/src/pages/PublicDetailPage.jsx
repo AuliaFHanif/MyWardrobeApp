@@ -5,9 +5,19 @@ import axios from 'axios'
 
 export default function ItemDetails() {
     const navigate = useNavigate()
-    const { id } = useParams();
     const [items, setItems] = useState(null);
+    const { id } = useParams();
 
+    const fetchItemById = async () => {
+            try {
+                const { data } = await phase2Api.get("/clothingItems/" + id, {});
+                console.log(data,"<============");
+                
+                setItems(data);
+            } catch (err) {
+                console.log("🚀 ~ fetchItemById ~ err:", err);
+            }
+        };
 
     const handleOnDeleteItem = async (itemId) => {
         try {
@@ -32,19 +42,8 @@ export default function ItemDetails() {
 
     }
     useEffect(() => {
-        const fetchItemById = async () => {
-            try {
-                const { data } = await phase2Api.get(`/clothingItems/${id}`, {});
-                console.log(data,"<============");
-                
-                setItems(data);
-            } catch (err) {
-                console.log("🚀 ~ fetchItemById ~ err:", err);
-            }
-        };
-
         fetchItemById();
-    }, [id]);
+    }, []);
 
     if (!items) {
         return <div>Loading...</div>;
@@ -81,37 +80,37 @@ export default function ItemDetails() {
                     <div className="d-flex flex-column gap-3 flex-grow-1">
                         <div className="bg-white rounded p-3">
                             <h2 className="mb-0" style={{ fontSize: '1.75rem', fontWeight: 'bold', color: '#333' }}>
-                                {items.items.type.type_name}
+                                {items.type.type_name}
                             </h2>
                         </div>
                         <div className="bg-white rounded p-3 flex-grow-1">
                             <p className="mb-0" style={{ fontSize: '1rem', color: '#555', lineHeight: '1.6' }}>
-                                {items.items.type.category}
+                                {items.type.category}
                             </p>
                         </div>
                         <div className="bg-white rounded p-3">
                             <p className="mb-0" style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#28a745' }}>
-                                {items.items.brand.brand_name}
+                                {items.brand.brand_name}
                             </p>
                         </div>
                         <div className="bg-white rounded p-3">
                             <p className="mb-0" style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#28a745' }}>
-                                {items.items.color.color_name}
+                                {items.color.color_name}
                             </p>
                         </div>
                         <div className="bg-white rounded p-3">
                             <p className="mb-0" style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#28a745' }}>
-                                {items.items.size}
+                                {items.size}
                             </p>
                         </div>
                         <div className="bg-white rounded p-3">
                             <p className="mb-0" style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#28a745' }}>
-                                {items.items.material}
+                                {items.material}
                             </p>
                         </div>
                         <div className="bg-white rounded p-3">
                             <p className="mb-0" style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#28a745' }}>
-                                {items.items.last_used}
+                                {items.last_used}
                             </p>
                         </div>
                           
