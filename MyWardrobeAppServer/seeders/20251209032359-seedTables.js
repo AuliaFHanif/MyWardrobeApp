@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const {User} = require('../models');
 
 module.exports = {
   async up(queryInterface, Sequelize) {
@@ -75,7 +76,7 @@ module.exports = {
       }));
 
       // Bulk insert data in correct order (respecting foreign keys)
-      await queryInterface.bulkInsert('Users', usersWithTimestamps, {});
+      await User.bulkCreate(usersWithTimestamps, {individualHooks: true});
       console.log('✅ Seeded Users');
 
       await queryInterface.bulkInsert('Brands', brandsWithTimestamps, {});

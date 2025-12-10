@@ -1,90 +1,116 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from "react-router";
-import ClothingItemCards from '../components/ClothingItemCards';
-import axios from 'axios'
+import ClothingItemCards from '../components/ClothingItemCards'
 import { phase2Api } from '../helpers/http.client'
+import Search from '../components/Search'
 
 function UserClothingItems() {
-    const [items, setItem] = useState([])
-
-    const fetchData = async () => {
+    const [items, setItems] = useState([])
+    const [categoryFilter, setCategoryFilter] = useState("")
+    const [brandFilter, setBrandFilter] = useState("")
+    const [colorFilter, setColorFilter] = useState("")
+    const [sortOrder, setSortOrder] = useState("DESC")
+    const [currentPage, setCurrentPage] = useState(1)
+    const itemsPerPage = 12
+    const fetchData = async (category = "", sort = "DESC", page = 1, brand_id = "", color_id = "") => {
         try {
-            const { data } = await phase2Api.get('/pub/cuisine', {
+            const params = {
+                page: page,
+                limit: itemsPerPage,
+                sort: 'createdAt',
+                order: sort
+            }
+            if (category) params.category = category
+            if (brand_id) params.brand_id = brand_id
+            if (color_id) params.color_id = color_id
+
+            const { data } = await phase2Api.get('/clothing', {
+                params: params,
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("access_token")}`
                 }
             })
-
-
-            console.log("API Response:", data);
-            setItem(data)
-
-
+            setItems(data)
         } catch (error) {
-            console.log(error.response)
-            window.Swal.fire({
-                icon: "error",
-                title: "Something Went Wrong",
-                text: error.response.data.message
-            })
+            console.log(error)
         }
     }
 
-    const handleOnDeleteItem = async (itemId) => {
-
-        await axios.delete(
-            "http://localhost:3000/cuisine/" + itemId,
-            {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-                },
-            }
-        )
-        fetchData()
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber)
+        fetchData(categoryFilter, sortOrder, pageNumber, brandFilter, colorFilter)
+        window.scrollTo({ top: 0, behavior: 'smooth' })
     }
 
-    const handleOnEditItem = async (itemId) => {
-
-        await axios.put(
-            "http://localhost:3000/cuisine/" + itemId,
-            {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-                },
-            }
-        )
-        fetchData()
+    const handleSearch = (category = "", sort = "DESC", page = 1, brand_id = "", color_id = "") => {
+        setCategoryFilter(category)
+        setSortOrder(sort)
+        setBrandFilter(brand_id)
+        setColorFilter(color_id)
+        setCurrentPage(1)
+        fetchData(category, sort, 1, brand_id, color_id)
     }
-
-
 
     useEffect(() => {
-        fetchData()
-
+        fetchData(categoryFilter, sortOrder, currentPage, brandFilter, colorFilter)
     }, [])
-
 
     return (
         <>
-            <div className="container-fluid py-5" style={{ backgroundColor: "#FFDCDC", minHeight: '100vh' }}>
-                <h1 className="text-center mb-4">Your Items</h1>
-                <div className="d-flex gap-5 flex-column flex-lg-row">
-                    <div id="form-section" style={{ width: '300px', flexShrink: 0 }}>
-                        <div className="px-5 pb-5 pt-3 rounded" style={{ backgroundColor: '#FFE8CD' }}>
-                            <div>
-                                <h2 className="text-center fs-5 fw-bold">Add clothing item</h2>
-                            </div>
-                            <Link className="btn btn-primary d-flex justify-content-center" aria-current="page" to="/createcuisine" style={{ color: '#ffffffff' }}>
-                                Add
-                            </Link>
+            <div className="container-fluid" style={{ backgroundColor: "#FFDCDC", minHeight: "100vh", paddingBottom: "3rem" }}>
+                <h1 className="text-center py-4">My Wardrobe</h1>
+                <div className="d-flex gap-4 flex-column flex-lg-row px-3">
+                    <div id="form-section" style={{
+                        width: '300px',
+                        flexShrink: 0,
+                        backgroundColor: '#FFE8CD',
+                        borderRadius: '8px',
+                        padding: '1.5rem',
+                        height: 'fit-content',
+                        position: 'sticky',
+                        top: '20px'
+                    }}>
+                        <div>
+                            <h2 className="text-center fs-5 fw-bold mb-3">Search Clothing</h2>
                         </div>
+                        <Search fetchData={handleSearch} />
                     </div>
-                    <div id="home-section" style={{ flex: 1 }}>
-                        <div className="d-flex gap-3 flex-wrap">
-                            {items.map((item) =>
-                                <ClothingItemCards key={item.id} item={item} items={items} handleOnDeleteItem={handleOnDeleteItem} />
-                            )}
-                        </div>
+                    <div id="home-section" style={{
+                        flex: 1,
+                        backgroundColor: '#FFE8CD',
+                        borderRadius: '8px',
+                        padding: '1.5rem'
+                    }}>
+
+                        {items.length > 0 ? (
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', justifyContent: 'flex-start' }}>
+                                {items.map((item) =>
+                                    <ClothingItemCards key={item.id} items={item} />)}
+                            </div>
+                        ) : (
+                            <p className="text-center text-muted">No clothing items found</p>
+                        )}
+
+                        {items.length > 0 && (
+                            <div className="d-flex justify-content-center align-items-center gap-2 mt-4">
+                                <button
+                                    className="btn btn-sm btn-outline-secondary"
+                                    onClick={() => handlePageChange(currentPage - 1)}
+                                    disabled={currentPage === 1}
+                                >
+                                    Previous
+                                </button>
+
+                                <span className="mx-2">Page {currentPage}</span>
+
+                                <button
+                                    className="btn btn-sm btn-outline-secondary"
+                                    onClick={() => handlePageChange(currentPage + 1)}
+                                    disabled={items.length < itemsPerPage}
+                                >
+                                    Next
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

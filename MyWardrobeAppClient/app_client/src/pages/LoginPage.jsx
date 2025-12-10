@@ -18,7 +18,7 @@ export default function LoginPage() {
 
             const token = response.data.access_token
             localStorage.setItem("access_token", token)
-            navigate('/cuisines')
+            navigate('/clothingItems/myItems')
         } catch (error) {
             window.Swal.fire({
                 icon: "error",

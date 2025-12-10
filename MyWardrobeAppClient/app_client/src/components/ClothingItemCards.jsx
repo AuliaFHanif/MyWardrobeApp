@@ -2,7 +2,7 @@ import { useNavigate } from "react-router"
 
 export default function ClothingItemCards( items) {
     const navigate = useNavigate()
-    console.log(items);
+    console.log(items.items);
     
     return (
         <div className="card" style={{
@@ -49,6 +49,7 @@ export default function ClothingItemCards( items) {
                     <br />
                     {items.items.color.color_name}
                     <br />
+                    {items.items.user.first_name}
                     
                 </h5>
                 <div className="mt-auto d-flex gap-2">

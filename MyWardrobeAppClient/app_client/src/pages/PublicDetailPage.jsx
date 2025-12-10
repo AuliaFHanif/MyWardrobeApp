@@ -6,20 +6,20 @@ import axios from 'axios'
 export default function ItemDetails() {
     const navigate = useNavigate()
     const { id } = useParams();
-    const [cuisine, setCuisine] = useState(null);
+    const [items, setItems] = useState(null);
 
 
-    const handleOnDeleteCuisine = async (CuisineId) => {
+    const handleOnDeleteItem = async (itemId) => {
         try {
             await axios.delete(
-                "http://localhost:3000/cuisine/" + CuisineId,
+                "http://localhost:3000/clothing/" + itemId,
                 {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
                     },
                 }
             )
-            navigate('/usercuisines')
+            navigate('/userclothing')
         } catch (error) {
             console.log(error);
 
@@ -32,30 +32,28 @@ export default function ItemDetails() {
 
     }
     useEffect(() => {
-        const fetchMovieById = async () => {
+        const fetchItemById = async () => {
             try {
-                const { data } = await phase2Api.get(`/cuisine/${id}`, {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("access_token")}`
-                    }
-                });
-                setCuisine(data);
+                const { data } = await phase2Api.get(`/clothingItems/${id}`, {});
+                console.log(data,"<============");
+                
+                setItems(data);
             } catch (err) {
-                console.log("🚀 ~ fetchMovieById ~ err:", err);
+                console.log("🚀 ~ fetchItemById ~ err:", err);
             }
         };
 
-        fetchMovieById();
+        fetchItemById();
     }, [id]);
 
-    if (!cuisine) {
+    if (!items) {
         return <div>Loading...</div>;
     }
 
     return (
         <div className="py-5" style={{ backgroundColor: '#FFF2EB', minHeight: '100vh' }}>
             <h1 className="text-center mb-4" style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#333' }}>
-                Cuisine Details
+                Item Details
             </h1>
             <div className="m-auto rounded overflow-hidden p-4" style={{
                 maxWidth: '700px',
@@ -70,8 +68,8 @@ export default function ItemDetails() {
                         justifyContent: 'center'
                     }}>
                         <img
-                            src={cuisine.imgUrl}
-                            alt={cuisine.name}
+                            src={items.image_url}
+                            alt={items.notes}
                             style={{
                                 maxWidth: '250px',
                                 maxHeight: '250px',
@@ -83,28 +81,49 @@ export default function ItemDetails() {
                     <div className="d-flex flex-column gap-3 flex-grow-1">
                         <div className="bg-white rounded p-3">
                             <h2 className="mb-0" style={{ fontSize: '1.75rem', fontWeight: 'bold', color: '#333' }}>
-                                {cuisine.name}
+                                {items.items.type.type_name}
                             </h2>
                         </div>
                         <div className="bg-white rounded p-3 flex-grow-1">
                             <p className="mb-0" style={{ fontSize: '1rem', color: '#555', lineHeight: '1.6' }}>
-                                {cuisine.description}
+                                {items.items.type.category}
                             </p>
                         </div>
                         <div className="bg-white rounded p-3">
                             <p className="mb-0" style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#28a745' }}>
-                                Rp.{cuisine.price}
+                                {items.items.brand.brand_name}
                             </p>
                         </div>
+                        <div className="bg-white rounded p-3">
+                            <p className="mb-0" style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#28a745' }}>
+                                {items.items.color.color_name}
+                            </p>
+                        </div>
+                        <div className="bg-white rounded p-3">
+                            <p className="mb-0" style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#28a745' }}>
+                                {items.items.size}
+                            </p>
+                        </div>
+                        <div className="bg-white rounded p-3">
+                            <p className="mb-0" style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#28a745' }}>
+                                {items.items.material}
+                            </p>
+                        </div>
+                        <div className="bg-white rounded p-3">
+                            <p className="mb-0" style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#28a745' }}>
+                                {items.items.last_used}
+                            </p>
+                        </div>
+                          
                         <div className="mt-auto d-flex gap-2">
                             <button
-                                onClick={() => navigate(`/editcuisine/${cuisine.id}`)}
+                                onClick={() => navigate(`/edititem/${items.id}`)}
                                 className="btn btn-warning flex-fill"
                                 style={{ fontSize: "0.875rem", fontWeight: "500", padding: "0.5rem" }}>
                                 Edit
                             </button>
                             <button
-                                onClick={() => handleOnDeleteCuisine(cuisine.id)}
+                                onClick={() => handleOnDeleteItem(items.id)}
                                 className="btn btn-danger flex-fill"
                                 style={{ fontSize: "0.875rem", fontWeight: "500", padding: "0.5rem" }}>
                                 Delete

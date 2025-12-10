@@ -1,98 +1,90 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { phase2Api } from '../helpers/http.client'
 
 export default function Search({ fetchData }) {
-    const [name, setName] = useState("")
-    const [categoryId, setCategoryId] = useState("")
+    const [category, setCategory] = useState("")
+    const [brand_id, setBrandId] = useState("")
+    const [color_id, setColorId] = useState("")
     const [sortOrder, setSortOrder] = useState("DESC")
+    const [brands, setBrands] = useState([])
+    const [colors, setColors] = useState([])
 
     const handleSubmit = async (event) => {
         event.preventDefault()
-        fetchData(name, categoryId, sortOrder)
+        fetchData(category, sortOrder, 1, brand_id, color_id)
     }
+
+    const getBrands = async () => {
+        const brandsData = await phase2Api.get('/pub/brands')
+        setBrands(brandsData.data)
+    }
+
+    const getColors = async () => {
+        const colorsData = await phase2Api.get('/pub/colors')
+        setColors(colorsData.data)
+    }
+
+    useEffect(() => {
+        getBrands()
+        getColors()
+    }, [])
 
     return (
         <form onSubmit={handleSubmit}>
             <div className="mb-3">
                 <label htmlFor="input-category" className="form-label">
-                    Type
-                </label>
-                <select
-                    value={categoryId}
-                    onChange={(event) => setCategoryId(event.target.value)}
-                    className="form-select"
-                    id="input-categoryId"
-                >
-                    <option value="">Select Cuisine Category</option>
-                    <option value="1">Italian</option>
-                    <option value="2">Thai</option>
-                    <option value="3">American</option>
-                    <option value="4">Japanese</option>
-                    <option value="5">Salads</option>
-                    <option value="6">Indian</option>
-                    <option value="7">Mexican</option>
-                </select>
-            </div>
-            <div className="mb-3">
-                <label htmlFor="input-category" className="form-label">
                     Category
                 </label>
                 <select
-                    value={categoryId}
-                    onChange={(event) => setCategoryId(event.target.value)}
+                    value={category}
+                    onChange={(event) => setCategory(event.target.value)}
                     className="form-select"
-                    id="input-categoryId"
+                    id="input-category"
                 >
-                    <option value="">Select Cuisine Category</option>
-                    <option value="1">Italian</option>
-                    <option value="2">Thai</option>
-                    <option value="3">American</option>
-                    <option value="4">Japanese</option>
-                    <option value="5">Salads</option>
-                    <option value="6">Indian</option>
-                    <option value="7">Mexican</option>
+                    <option value="">Select item category</option>
+                    <option value="Tops">Tops</option>
+                    <option value="Bottoms">Bottoms</option>
+                    <option value="Dresses">Dresses</option>
+                    <option value="Outerwear">Outerwear</option>
+                    <option value="Formalwear">Formal</option>
+                    <option value="Footwear">Footwear</option>
+                    <option value="Swimwear">Swimwear</option>
+                    <option value="Activewear">Activewear</option>
+                    <option value="Accessories">Accessories</option>
                 </select>
             </div>
             <div className="mb-3">
-                <label htmlFor="input-category" className="form-label">
+                <label htmlFor="input-brandId" className="form-label">
                     Brand
                 </label>
                 <select
-                    value={categoryId}
-                    onChange={(event) => setCategoryId(event.target.value)}
+                    value={brand_id}
+                    onChange={(event) => setBrandId(event.target.value)}
                     className="form-select"
-                    id="input-categoryId"
+                    id="input-brandId"
                 >
-                    <option value="">Select Cuisine Category</option>
-                    <option value="1">Italian</option>
-                    <option value="2">Thai</option>
-                    <option value="3">American</option>
-                    <option value="4">Japanese</option>
-                    <option value="5">Salads</option>
-                    <option value="6">Indian</option>
-                    <option value="7">Mexican</option>
+                    <option value="">Select item brand</option>
+                    {brands.map((brand) => (
+                        <option key={brand.id} value={brand.id}>{brand.brand_name}</option>
+                    ))}
                 </select>
             </div>
             <div className="mb-3">
-                <label htmlFor="input-category" className="form-label">
+                <label htmlFor="input-colorId" className="form-label">
                     Color
                 </label>
                 <select
-                    value={categoryId}
-                    onChange={(event) => setCategoryId(event.target.value)}
+                    value={color_id}
+                    onChange={(event) => setColorId(event.target.value)}
                     className="form-select"
-                    id="input-categoryId"
+                    id="input-colorId"
                 >
-                    <option value="">Select Cuisine Category</option>
-                    <option value="1">Italian</option>
-                    <option value="2">Thai</option>
-                    <option value="3">American</option>
-                    <option value="4">Japanese</option>
-                    <option value="5">Salads</option>
-                    <option value="6">Indian</option>
-                    <option value="7">Mexican</option>
+                    <option value="">Select item color</option>
+                    {colors.map((color) => (
+                        <option key={color.id} value={color.id}>{color.color_name}</option>
+                    ))}
                 </select>
             </div>
-            
             <button type="submit" className="btn btn-primary w-100">
                 Search
             </button>

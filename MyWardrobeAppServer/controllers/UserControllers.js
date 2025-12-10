@@ -34,8 +34,10 @@ class Users {
             if (!user) {
                 throw { name: 'Unauthorized', message: 'Wrong username or password' }
             }
-
-            const isValidPassword = comparePassword(password, user.password)
+            console.log(password,"<================");
+            console.log(user.password_hash,'<---------------');
+            
+            const isValidPassword = comparePassword(password, user.password_hash)
 
             if (!isValidPassword) {
                 throw { name: 'Unauthorized', message: 'Wrong username or password' }
@@ -47,7 +49,8 @@ class Users {
 
         } catch (error) {
             // console.log(error);
-
+            console.log(error);
+            
             next(error)
 
         }
