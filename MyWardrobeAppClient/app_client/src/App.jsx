@@ -6,6 +6,7 @@ import PublicClothingItems from "./pages/PublicPage.jsx";
 import ItemDetails from "./pages/PublicDetailPage.jsx";
 import UserClothingItems from "./pages/UserClothingItems.jsx";
 import AddItem from "./pages/CreateClothingItem.jsx";
+import EditItem from "./pages/EditClothingItem.jsx";
 
 
 
@@ -59,6 +60,7 @@ function App() {
         <Route element={<ProtectedLayout />}>
           <Route path="/clothingItems/myItems" element={<UserClothingItems />} />
           <Route path="/clothingItems/myItems/add" element={<AddItem />} />
+          <Route path="/clothingItems/myItems/edit/:id" element={<EditItem />} />
         </Route>
       </Routes>
     </BrowserRouter>

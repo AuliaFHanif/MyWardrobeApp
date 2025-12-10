@@ -11,6 +11,21 @@ function UserClothingItems() {
     const [sortOrder, setSortOrder] = useState("DESC")
     const [currentPage, setCurrentPage] = useState(1)
     const itemsPerPage = 12
+
+    const handleDelete = async (id) => {
+            try {
+                await phase2Api.delete(`/clothing/${id}`, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("access_token")}`
+                    }
+                });
+                // refetch current list after successful delete
+                fetchData(categoryFilter, sortOrder, currentPage, brandFilter, colorFilter)
+            } catch (err) {
+                console.log(err);
+            }
+        }
+
     const fetchData = async (category = "", sort = "DESC", page = 1, brand_id = "", color_id = "") => {
         try {
             const params = {
@@ -84,7 +99,7 @@ function UserClothingItems() {
                         {items.length > 0 ? (
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', justifyContent: 'flex-start' }}>
                                 {items.map((item) =>
-                                    <PrivateItemCards key={item.id} items={item} />)}
+                                    <PrivateItemCards key={item.id} items={item} handleDelete={handleDelete} />)}
                             </div>
                         ) : (
                             <p className="text-center text-muted">No clothing items found</p>

@@ -1,17 +1,8 @@
 import { useNavigate } from "react-router"
 
-export default function PrivateItemCards( items) {
+export default function PrivateItemCards({ items, handleDelete }) {
     const navigate = useNavigate()
-    console.log(items.items.id);
 
-    const handleDelete = async () => {
-            try {
-                await phase2Api.delete(`/clothing/${items.items.id}` , {});
-                navigate('/clothingItems/myItems')
-            } catch (err) {
-                console.log(err);
-            }
-        }
     
     return (
         <div className="card" style={{
@@ -33,9 +24,9 @@ export default function PrivateItemCards( items) {
                 e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)"
             }}>
                 <img
-                src={items.items.image_url}
+                src={items.image_url}
                 className="card-img-top"
-                alt={items.items.name}
+                alt={items.name}
                 style={{
                     height: "170px",
                     objectFit: "cover",
@@ -50,27 +41,27 @@ export default function PrivateItemCards( items) {
                     whiteSpace: "nowrap",
                     color: "#333"
                 }}>
-                    {items.items.type.type_name}
+                    {items.type?.type_name}
                     <br />
-                    {items.items.type.category}
+                    {items.type?.category}
                     <br />
-                    {items.items.brand.brand_name}
+                    {items.brand?.brand_name}
                     <br />
-                    {items.items.color.color_name}
+                    {items.color?.color_name}
                     <br />
-                    {items.items.user.first_name}
+                    {items.user?.first_name}
                     
                 </h5>
                 <div className="mt-auto d-flex gap-2">
                     <button
-                        onClick={() => navigate(`/clothingItems/${items.items.id}`)}
+                        onClick={() => navigate(`/clothingItems/${items.id}`)}
                         className="btn btn-warning flex-fill"
                         style={{ fontSize: "0.875rem", fontWeight: "500", padding: "0.5rem" }}>
                         Edit
                     </button>
                     <button
-                        onClick={() => navigate(`/clothingItems/${items.items.id}`)}
-                        className="btn btn-warning flex-fill"
+                        onClick={() => handleDelete(items.id)}
+                        className="btn btn-danger flex-fill"
                         style={{ fontSize: "0.875rem", fontWeight: "500", padding: "0.5rem" }}>
                         Delete
                     </button>

@@ -15,12 +15,12 @@ export default function Search({ fetchData }) {
     }
 
     const getBrands = async () => {
-        const brandsData = await phase2Api.get('/pub/brands')
+        const brandsData = await phase2Api.get('/brands')
         setBrands(brandsData.data)
     }
 
     const getColors = async () => {
-        const colorsData = await phase2Api.get('/pub/colors')
+        const colorsData = await phase2Api.get('/colors')
         setColors(colorsData.data)
     }
 

@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router"
 
-export default function PublicItemCards( items) {
+export default function PublicItemCards( items, handleDelete) {
     const navigate = useNavigate()
     console.log(items.items.id);
     
