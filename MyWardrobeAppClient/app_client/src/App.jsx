@@ -7,6 +7,7 @@ import ItemDetails from "./pages/PublicDetailPage.jsx";
 import UserClothingItems from "./pages/UserClothingItems.jsx";
 import AddItem from "./pages/CreateClothingItem.jsx";
 import EditItem from "./pages/EditClothingItem.jsx";
+import AdminPage from "./pages/AdminPage.jsx";
 
 
 
@@ -61,6 +62,7 @@ function App() {
           <Route path="/clothingItems/myItems" element={<UserClothingItems />} />
           <Route path="/clothingItems/myItems/add" element={<AddItem />} />
           <Route path="/clothingItems/myItems/edit/:id" element={<EditItem />} />
+          <Route path="/admin" element={<AdminPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
