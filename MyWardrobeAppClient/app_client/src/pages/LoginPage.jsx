@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { phase2Api } from '../helpers/http.client'
 import { Navigate, useNavigate, Link } from "react-router"
 
@@ -6,6 +6,31 @@ export default function LoginPage() {
     let navigate = useNavigate()
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+
+
+
+    async function handleCredentialResponse(googleResponse) {  // Renamed to avoid conflict
+    console.log("Encoded JWT ID token: " + googleResponse.credential);
+    try {
+        const apiResponse = await phase2Api.post("/loginGoogle", {  // Renamed
+            googleAccessToken: googleResponse.credential
+        })
+
+        const token = apiResponse.data.access_token
+        console.log(token);
+        
+        localStorage.setItem("access_token", token)
+        navigate('/clothingItems')
+    } catch (error) {
+        console.error('Google login error:', error);  // Add this for debugging
+        window.Swal.fire({
+            icon: "error",
+            title: "Something Went Wrong",
+            text: error.response?.data?.message || "Google login failed"
+        })
+    }
+}
+
 
     async function handleLogin(event) {
         event.preventDefault()
@@ -27,6 +52,19 @@ export default function LoginPage() {
             })
         }
     }
+
+    useEffect(() => {
+        google.accounts.id.initialize({
+
+            client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+            callback: handleCredentialResponse
+        });
+        google.accounts.id.renderButton(
+            document.getElementById("buttonDiv"),
+            { theme: "outline", size: "large" }  // customization attributes
+        );
+        google.accounts.id.prompt(); // also display the One Tap dialog
+    }, [])
 
     return (
         <section id="login-page" style={{
@@ -117,6 +155,24 @@ export default function LoginPage() {
                                 }}>
                                     Login
                                 </button>
+                            </div>
+
+                            {/* Divider */}
+                            <div className="d-flex align-items-center my-3">
+                                <hr style={{ flex: 1, borderColor: '#ddd' }} />
+                                <span style={{
+                                    padding: '0 1rem',
+                                    color: '#666',
+                                    fontSize: '0.9rem'
+                                }}>
+                                    OR
+                                </span>
+                                <hr style={{ flex: 1, borderColor: '#ddd' }} />
+                            </div>
+
+                            {/* Google Sign In Button */}
+                            <div className="d-flex justify-content-center">
+                                <div id="buttonDiv"></div>
                             </div>
                         </form>
                         <Link

@@ -30,6 +30,7 @@ app.get('/types', Types.getAllTypes);
 
 
 app.post('/login', Users.login)
+app.post('/loginGoogle', Users.googleSignIn)
 app.use(authentication)
 app.post('/add-user', verifyRole, Users.createUser)
 
