@@ -8,14 +8,14 @@ function OutfitSuggestion() {
     const [suggestions, setSuggestions] = useState(null);
     const [currentSuggestionIndex, setCurrentSuggestionIndex] = useState(0);
 
-    // Initialize useNavigate hook for redirection
+
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         try {
-            // Placeholder/Dummy API call (now assumes it returns the structure you provided)
+           
             const response = await phase2Api.get('/clothing/suggestionsDummy', {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("access_token")}`
@@ -53,12 +53,11 @@ function OutfitSuggestion() {
     const handleWearOutfit = async () => {
         if (!currentOutfit) return;
 
-        // Get the item IDs from the current outfit
+     
         const itemIds = currentOutfit.items;
 
         try {
-            // API call to update the last used date
-            // CORRECT STRUCTURE
+         
             await phase2Api.post("/clothing/last-used",
                 { itemIds: itemIds }, 
                 { 
@@ -68,7 +67,7 @@ function OutfitSuggestion() {
                 }
             );
 
-            // Redirect the user
+            
             navigate("/clothingItems/myItems");
 
         } catch (error) {
@@ -83,7 +82,7 @@ function OutfitSuggestion() {
                 <div className="col-lg-8">
 
                     {!showSuggestions ? (
-                        // FORM VIEW 
+                 
                         <div className="card shadow">
                             <div className="card-body">
                                 <h2 className="card-title text-center mb-4">Get Outfit Suggestions</h2>
@@ -117,7 +116,7 @@ function OutfitSuggestion() {
                             </div>
                         </div>
                     ) : (
-                        // SUGGESTIONS VIEW - Single Card Style with Navigation and Images
+                        
                         <div className="suggestions-view">
                             <button onClick={() => setShowSuggestions(false)} className="btn btn-secondary mb-4">
                                 &larr; Back to Form
@@ -125,7 +124,7 @@ function OutfitSuggestion() {
 
                             <h1 className="text-center mb-4 text-primary">👗 AI Outfit Recommendations 👔</h1>
 
-                            {/* Criteria Card */}
+                          
                             {suggestions && suggestions.criteria && (
                                 <div className="card bg-light mb-4 shadow-sm border-info">
                                     <div className="card-header bg-info text-white">
@@ -139,43 +138,43 @@ function OutfitSuggestion() {
                                 </div>
                             )}
 
-                            {/* Single Outfit Card */}
+                        
                             {currentOutfit && (
                                 <div className="card shadow mb-4">
 
-                                    {/* Assuming card-header is here */}
+                                  
 
                                     <div className="card-body">
 
-                                        {/* Description */}
+                                      
                                         <div className="mb-3">
                                             <h5 className="h6 card-subtitle text-muted mb-2">Description</h5>
                                             <p className="card-text">{currentOutfit.description}</p>
                                         </div>
 
-                                        {/* Style Tips (Alert Style) */}
+                                    
                                         <div className="alert alert-warning p-2 small" role="alert">
                                             **Tips:** {currentOutfit.style_tips}
                                         </div>
 
-                                        {/* --- START OF DETAILED VERTICAL LIST --- */}
+                                       
                                         <h5 className="h6 card-subtitle text-muted mt-3 mb-3">Items Used</h5>
 
                                         <div className="list-group">
                                             {currentOutfit.itemDetails.map((item) => (
-                                                // We will add the title attribute to this main item container
+                                                
                                                 <div
                                                     key={item.id}
                                                     className="list-group-item list-group-item-action p-3 mb-2 border rounded shadow-sm"
-                                                    title={item.notes ? `Notes: ${item.notes}` : undefined} // <-- ADDED Tooltip here
+                                                    title={item.notes ? `Notes: ${item.notes}` : undefined} 
                                                 >
 
-                                                    {/* Inner row to align image (left) and details (right) */}
+                                              
                                                     <div className="row align-items-center">
 
-                                                        {/* Column 1: Image (Unchanged) */}
+                                                       
                                                         <div className="col-2 me-3">
-                                                            {/* ... image block remains the same ... */}
+                                                         
                                                             {item.image_url ? (
                                                                 <img
                                                                     src={item.image_url}
@@ -190,7 +189,7 @@ function OutfitSuggestion() {
                                                             )}
                                                         </div>
 
-                                                        {/* Column 2: Details */}
+                                                   
                                                         <div className="col">
                                                             <h6 className="mb-1 fw-bold text-primary">{item.name}</h6>
                                                             <div className="d-flex flex-wrap align-items-center small text-muted">
@@ -211,11 +210,11 @@ function OutfitSuggestion() {
                                                                     <span className="fw-semibold">Size:</span> {item.size}
                                                                 </span>
 
-                                                                {/* Notes: Now displayed simply, with full text on hover (via parent's title attribute) */}
+                                                      
                                                                 {item.notes && (
                                                                     <span className="text-secondary">
                                                                         <span className="fw-semibold ms-2">Notes:</span>
-                                                                        {/* Removed text-truncate and max-width here */}
+                                                            
                                                                         {item.notes}
                                                                     </span>
                                                                 )}
@@ -225,7 +224,7 @@ function OutfitSuggestion() {
                                                 </div>
                                             ))}
                                         </div>
-                                        {/* --- END OF DETAILED VERTICAL LIST --- */}
+                               
 
                                     </div>
                                     <div className="card-footer text-muted small">
@@ -234,7 +233,7 @@ function OutfitSuggestion() {
                                 </div>
                             )}
 
-                            {/* Navigation and Action Controls */}
+                       
                             <div className="d-flex justify-content-between align-items-center mb-4">
                                 <button
                                     className="btn btn-outline-primary"

@@ -54,7 +54,7 @@ export default function PrivateItemCards({ items, handleDelete }) {
                 </h5>
                 <div className="mt-auto d-flex gap-2">
                     <button
-                        onClick={() => navigate(`/clothingItems/${items.id}`)}
+                        onClick={() => navigate(`/clothingItems/myItems/edit/${items.id}`)}
                         className="btn btn-warning flex-fill"
                         style={{ fontSize: "0.875rem", fontWeight: "500", padding: "0.5rem" }}>
                         Edit

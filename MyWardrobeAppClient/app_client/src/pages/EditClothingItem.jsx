@@ -1,14 +1,15 @@
-import axios from "axios";
 import { useNavigate, useParams } from "react-router";
 import { useState, useRef, useEffect } from "react";
 import { phase2Api } from "../helpers/http.client";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchEditItemData, updateItem, setFormField, resetForm } from "../features/clothing/editItemSlice";
 
-// Helper function to get nested property
+
 function getNestedValue(obj, path) {
   return path.split(".").reduce((current, prop) => current?.[prop], obj);
 }
 
-// Searchable Dropdown Component
+
 function SearchableDropdown({
   label,
   value,
@@ -23,7 +24,7 @@ function SearchableDropdown({
   const wrapperRef = useRef(null);
   const inputRef = useRef(null);
 
-  // Find the selected option from the options array
+
   const selectedOption = options.find((opt) => opt[valueKey] === value);
   const displayValue = selectedOption
     ? getNestedValue(selectedOption, displayKey)
@@ -35,7 +36,7 @@ function SearchableDropdown({
       .includes(search.toLowerCase())
   );
 
-  // Reset search when dropdown closes or when value changes
+
   useEffect(() => {
     if (!isOpen) {
       setSearch("");
@@ -147,346 +148,211 @@ function SearchableDropdown({
   );
 }
 
-export default function EditItem({ items, setItems, fetchData }) {
+export default function EditItem({}) {
   const navigate = useNavigate();
-  const { id } = useParams();
+    const dispatch = useDispatch();
+    const { id } = useParams();
 
-  const [brand_id, setBrand] = useState("");
-  const [type_id, setType] = useState("");
-  const [color_id, setColor] = useState("");
-  const [size, setSize] = useState("");
-  const [material, setMaterial] = useState("");
-  const [image_url, setImageUrl] = useState("");
-  const [notes, setNotes] = useState("");
-  const [last_used, setLastUsed] = useState("");
+ 
+    const { 
+        formData, 
+        brands, 
+        types, 
+        colors, 
+        status, 
+        error 
+    } = useSelector((state) => state.editItem);
 
-  const [colors, setColors] = useState([]);
-  const [brands, setBrands] = useState([]);
-  const [types, setTypes] = useState([]);
+   
+    useEffect(() => {
+        dispatch(fetchEditItemData(id));
+        
+     
+        return () => {
+            dispatch(resetForm());
+        };
+    }, [id, dispatch]);
 
-  useEffect(() => {
-    // Fetch all data in parallel
-    const fetchAllData = async () => {
-      try {
-        // First fetch all reference data
-        const [colorsData, brandsData, typesData, clothingData] =
-          await Promise.all([
-            phase2Api.get("/colors", {}),
-            phase2Api.get("/brands", {}),
-            phase2Api.get("/types", {}),
-            phase2Api.get("/clothingItems/" + id, {
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-              },
-            }),
-          ]);
-
-        console.log(clothingData.data, "<============ Clothing Item");
-        console.log(brandsData.data, "<============ Brands");
-        console.log(typesData.data, "<============ Types");
-        console.log(colorsData.data, "<============ Colors");
-
-        // Set the reference data
-        setColors(colorsData.data);
-        setBrands(brandsData.data);
-        setTypes(typesData.data);
-
-        // Now match IDs with the fetched reference data
-        const brandId =
-          brandsData.data.find(
-            (b) => b.brand_name === clothingData.data.brand?.brand_name
-          )?.id || "";
-        const typeId =
-          typesData.data.find(
-            (t) => t.type_name === clothingData.data.type?.type_name
-          )?.id || "";
-        const colorId =
-          colorsData.data.find(
-            (c) => c.color_name === clothingData.data.color?.color_name
-          )?.id || "";
-
-        console.log("Matched IDs:", { brandId, typeId, colorId });
-
-        // Set the clothing item data
-        setBrand(brandId);
-        setType(typeId);
-        setColor(colorId);
-        setSize(clothingData.data.size);
-        setMaterial(clothingData.data.material || "");
-        setImageUrl(clothingData.data.image_url || "");
-        setNotes(clothingData.data.notes || "");
-        // Extract just the date portion (YYYY-MM-DD) from the timestamp
-        let lastUsedDate = "";
-        if (
-          clothingData.data.last_used &&
-          typeof clothingData.data.last_used === "string" &&
-          clothingData.data.last_used.length >= 10
-        ) {
-          // Extract the first 10 characters: "YYYY-MM-DD"
-          lastUsedDate = clothingData.data.last_used.substring(0, 10);
-        }
-        setLastUsed(lastUsedDate);
-      } catch (err) {
-        console.log("🚀 ~ fetchAllData ~ err:", err);
-      }
+ 
+    const handleChange = (name, value) => {
+        dispatch(setFormField({ name, value }));
     };
-    fetchAllData();
-  }, [id]);
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    const requestBody = {
-      brand_id,
-      type_id,
-      color_id,
-      size,
-      material,
-      image_url,
-      notes,
-    };
-    console.log({
-      brand_id,
-      type_id,
-      color_id,
-      size,
-      material,
-      image_url,
-      notes,
-    });
 
-    try {
-      const response = await phase2Api.put("/clothing/" + id, requestBody, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        },
-      });
+    const handleSubmit = async (event) => {
+        event.preventDefault();
 
-      if (fetchData) {
-        try {
-          await fetchData();
-        } catch (fetchError) {
-          console.log("🚀 ~ fetchData error:", fetchError);
+        
+        const resultAction = await dispatch(updateItem({ id, data: formData }));
+
+        if (updateItem.fulfilled.match(resultAction)) {
+        
+            navigate("/clothingItems/myItems");
+        } else {
+        
+            Swal.fire({
+                icon: "error",
+                title: "Something Went Wrong",
+                text: typeof resultAction.payload === 'string' ? resultAction.payload : resultAction.payload?.message || "An error occurred",
+            });
         }
-      }
+    };
 
-      // Navigate after successful update
-      navigate("/clothingItems/myItems");
-    } catch (error) {
-      console.log(error);
-      window.Swal.fire({
-        icon: "error",
-        title: "Something Went Wrong",
-        text: error.response?.data?.message || "An error occurred",
-      });
+    if (status === 'loading') {
+        return <div className="text-center py-5">Loading...</div>;
     }
-  };
 
+    if (status === 'failed') {
+        return <div className="text-center py-5 text-danger">Error: {error}</div>;
+    }
   return (
-    <div
-      className="py-5"
-      style={{ backgroundColor: "#FFF2EB", minHeight: "100vh" }}
-    >
-      <div className="container">
-        <div className="row justify-content-center">
-          <div className="col-md-8">
-            <h1
-              className="text-center mb-5"
-              style={{ fontSize: "2.5rem", fontWeight: "bold", color: "#333" }}
-            >
-              Edit Item
-            </h1>
+        <div className="py-5" style={{ backgroundColor: "#FFF2EB", minHeight: "100vh" }}>
+            <div className="container">
+                <div className="row justify-content-center">
+                    <div className="col-md-8">
+                        <h1 className="text-center mb-5" style={{ fontSize: "2.5rem", fontWeight: "bold", color: "#333" }}>
+                            Edit Item
+                        </h1>
 
-            <form
-              onSubmit={handleSubmit}
-              className="rounded p-5"
-              style={{
-                backgroundColor: "#FFE8CD",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-              }}
-            >
-              <div
-                style={{
-                  backgroundColor: "#FFFFFF",
-                  padding: "2rem",
-                  borderRadius: "8px",
-                }}
-              >
-                <SearchableDropdown
-                  label="Brand"
-                  value={brand_id}
-                  onChange={setBrand}
-                  options={brands}
-                  placeholder="Select or search brand"
-                  displayKey="brand_name"
-                  valueKey="id"
-                />
+                        <form onSubmit={handleSubmit} className="rounded p-5" style={{ backgroundColor: "#FFE8CD", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
+                            <div style={{ backgroundColor: "#FFFFFF", padding: "2rem", borderRadius: "8px" }}>
+                                
+                                <SearchableDropdown
+                                    label="Brand"
+                                    value={formData.brand_id}
+                                    onChange={(val) => handleChange('brand_id', val)}
+                                    options={brands}
+                                    placeholder="Select or search brand"
+                                    displayKey="brand_name"
+                                    valueKey="id"
+                                />
 
-                <SearchableDropdown
-                  label="Type"
-                  value={type_id}
-                  onChange={setType}
-                  options={types}
-                  placeholder="Select or search type"
-                  displayKey="type_name"
-                  valueKey="id"
-                />
+                                <SearchableDropdown
+                                    label="Type"
+                                    value={formData.type_id}
+                                    onChange={(val) => handleChange('type_id', val)}
+                                    options={types}
+                                    placeholder="Select or search type"
+                                    displayKey="type_name"
+                                    valueKey="id"
+                                />
 
-                <SearchableDropdown
-                  label="Color"
-                  value={color_id}
-                  onChange={setColor}
-                  options={colors}
-                  placeholder="Select or search color"
-                  displayKey="color_name"
-                  valueKey="id"
-                />
+                                <SearchableDropdown
+                                    label="Color"
+                                    value={formData.color_id}
+                                    onChange={(val) => handleChange('color_id', val)}
+                                    options={colors}
+                                    placeholder="Select or search color"
+                                    displayKey="color_name"
+                                    valueKey="id"
+                                />
 
-                <div className="mb-3">
-                  <label
-                    htmlFor="input-size"
-                    className="form-label"
-                    style={{ fontWeight: "600", color: "#333" }}
-                  >
-                    Size
-                  </label>
-                  <select
-                    value={size}
-                    onChange={(event) => setSize(event.target.value)}
-                    className="form-select"
-                    id="input-size"
-                    style={{ borderColor: "#DDD", borderRadius: "4px" }}
-                  >
-                    <option value="">Select clothing size</option>
-                    <option value="XSS">XSS</option>
-                    <option value="XS">XS</option>
-                    <option value="S">S</option>
-                    <option value="M">M</option>
-                    <option value="L">L</option>
-                    <option value="XL">XL</option>
-                    <option value="XXL">XXL</option>
-                    <option value="XXXL">XXXL</option>
-                  </select>
-                </div>
+                                <div className="mb-3">
+                                    <label htmlFor="input-size" className="form-label" style={{ fontWeight: "600", color: "#333" }}>Size</label>
+                                    <select
+                                        value={formData.size}
+                                        onChange={(e) => handleChange('size', e.target.value)}
+                                        className="form-select"
+                                        id="input-size"
+                                        style={{ borderColor: "#DDD", borderRadius: "4px" }}
+                                    >
+                                        <option value="">Select clothing size</option>
+                                        <option value="XSS">XSS</option>
+                                        <option value="XS">XS</option>
+                                        <option value="S">S</option>
+                                        <option value="M">M</option>
+                                        <option value="L">L</option>
+                                        <option value="XL">XL</option>
+                                        <option value="XXL">XXL</option>
+                                        <option value="XXXL">XXXL</option>
+                                    </select>
+                                </div>
 
-                <div className="mb-3">
-                  <label
-                    htmlFor="input-material"
-                    className="form-label"
-                    style={{ fontWeight: "600", color: "#333" }}
-                  >
-                    Material
-                  </label>
-                  <input
-                    value={material}
-                    onChange={(event) => setMaterial(event.target.value)}
-                    type="text"
-                    className="form-control"
-                    id="input-material"
-                    placeholder="Material"
-                    style={{ borderColor: "#DDD", borderRadius: "4px" }}
-                  />
-                </div>
+                                <div className="mb-3">
+                                    <label htmlFor="input-material" className="form-label" style={{ fontWeight: "600", color: "#333" }}>Material</label>
+                                    <input
+                                        value={formData.material}
+                                        onChange={(e) => handleChange('material', e.target.value)}
+                                        type="text"
+                                        className="form-control"
+                                        id="input-material"
+                                        placeholder="Material"
+                                        style={{ borderColor: "#DDD", borderRadius: "4px" }}
+                                    />
+                                </div>
 
-                <div className="mb-3">
-                  <label
-                    htmlFor="input-image-url"
-                    className="form-label"
-                    style={{ fontWeight: "600", color: "#333" }}
-                  >
-                    Image URL
-                  </label>
-                  <input
-                    value={image_url}
-                    onChange={(event) => setImageUrl(event.target.value)}
-                    type="text"
-                    className="form-control"
-                    id="input-image-url"
-                    placeholder="Image URL"
-                    style={{ borderColor: "#DDD", borderRadius: "4px" }}
-                  />
-                  {image_url && (
-                    <div className="mt-2">
-                      <img
-                        src={image_url}
-                        alt="Preview"
-                        style={{
-                          maxWidth: "200px",
-                          maxHeight: "200px",
-                          borderRadius: "4px",
-                        }}
-                        onError={(e) => {
-                          e.target.style.display = "none";
-                        }}
-                      />
+                                <div className="mb-3">
+                                    <label htmlFor="input-image-url" className="form-label" style={{ fontWeight: "600", color: "#333" }}>Image URL</label>
+                                    <input
+                                        value={formData.image_url}
+                                        onChange={(e) => handleChange('image_url', e.target.value)}
+                                        type="text"
+                                        className="form-control"
+                                        id="input-image-url"
+                                        placeholder="Image URL"
+                                        style={{ borderColor: "#DDD", borderRadius: "4px" }}
+                                    />
+                                    {formData.image_url && (
+                                        <div className="mt-2">
+                                            <img
+                                                src={formData.image_url}
+                                                alt="Preview"
+                                                style={{ maxWidth: "200px", maxHeight: "200px", borderRadius: "4px" }}
+                                                onError={(e) => { e.target.style.display = "none"; }}
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="mb-3">
+                                    <label htmlFor="input-notes" className="form-label" style={{ fontWeight: "600", color: "#333" }}>Notes</label>
+                                    <input
+                                        value={formData.notes}
+                                        onChange={(e) => handleChange('notes', e.target.value)}
+                                        type="text"
+                                        className="form-control"
+                                        id="input-notes"
+                                        placeholder="Add notes"
+                                        style={{ borderColor: "#DDD", borderRadius: "4px" }}
+                                    />
+                                </div>
+
+                                <div className="mb-4">
+                                    <label htmlFor="input-last-used" className="form-label" style={{ fontWeight: "600", color: "#333" }}>Last used</label>
+                                    <input
+                                        value={formData.last_used}
+                                        onChange={(e) => handleChange('last_used', e.target.value)}
+                                        type="date"
+                                        className="form-control"
+                                        id="input-last-used"
+                                        style={{ borderColor: "#DDD", borderRadius: "4px" }}
+                                    />
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    disabled={status === 'submitting'}
+                                    className="btn w-100"
+                                    style={{
+                                        backgroundColor: "#FF8C42",
+                                        color: "#FFFFFF",
+                                        fontWeight: "600",
+                                        padding: "0.75rem",
+                                        borderRadius: "4px",
+                                        border: "none",
+                                        fontSize: "1rem",
+                                        cursor: status === 'submitting' ? "not-allowed" : "pointer",
+                                    }}
+                                    onMouseOver={(e) => (e.target.style.backgroundColor = "#E67E2E")}
+                                    onMouseOut={(e) => (e.target.style.backgroundColor = "#FF8C42")}
+                                >
+                                    {status === 'submitting' ? 'Updating...' : 'Update Item'}
+                                </button>
+                            </div>
+                        </form>
                     </div>
-                  )}
                 </div>
-
-                <div className="mb-3">
-                  <label
-                    htmlFor="input-notes"
-                    className="form-label"
-                    style={{ fontWeight: "600", color: "#333" }}
-                  >
-                    Notes
-                  </label>
-                  <input
-                    value={notes}
-                    onChange={(event) => setNotes(event.target.value)}
-                    type="text"
-                    className="form-control"
-                    id="input-notes"
-                    placeholder="Add notes"
-                    style={{ borderColor: "#DDD", borderRadius: "4px" }}
-                  />
-                </div>
-
-                <div className="mb-4">
-                  <label
-                    htmlFor="input-last-used"
-                    className="form-label"
-                    style={{ fontWeight: "600", color: "#333" }}
-                  >
-                    Last used
-                  </label>
-                  <input
-                    value={last_used}
-                    onChange={(event) => setLastUsed(event.target.value)}
-                    type="date"
-                    className="form-control"
-                    id="input-last-used"
-                    style={{ borderColor: "#DDD", borderRadius: "4px" }}
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="btn w-100"
-                  style={{
-                    backgroundColor: "#FF8C42",
-                    color: "#FFFFFF",
-                    fontWeight: "600",
-                    padding: "0.75rem",
-                    borderRadius: "4px",
-                    border: "none",
-                    fontSize: "1rem",
-                    cursor: "pointer",
-                    transition: "background-color 0.2s",
-                  }}
-                  onMouseOver={(e) =>
-                    (e.target.style.backgroundColor = "#E67E2E")
-                  }
-                  onMouseOut={(e) =>
-                    (e.target.style.backgroundColor = "#FF8C42")
-                  }
-                >
-                  Update Item
-                </button>
-              </div>
-            </form>
-          </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }

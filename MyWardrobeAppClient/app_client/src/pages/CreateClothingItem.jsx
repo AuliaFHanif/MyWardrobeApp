@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router';
 import { useState, useRef, useEffect } from 'react'
 import { phase2Api } from '../helpers/http.client'
 
-// Searchable Dropdown Component
+
 function SearchableDropdown({ label, value, onChange, options, placeholder, displayKey = "name", valueKey = "id" }) {
     const [isOpen, setIsOpen] = useState(false);
     const [search, setSearch] = useState('');
@@ -206,7 +206,7 @@ export default function AddItem({ items, setItems, fetchData }) {
             setImageUrl("")
             setNotes("")
             
-            // Navigate after state is cleared
+        
             setTimeout(() => {
                 navigate('/clothingItems/myItems')
             }, 300)

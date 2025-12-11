@@ -9,10 +9,10 @@ export default function LoginPage() {
 
 
 
-    async function handleCredentialResponse(googleResponse) {  // Renamed to avoid conflict
+    async function handleCredentialResponse(googleResponse) { 
     console.log("Encoded JWT ID token: " + googleResponse.credential);
     try {
-        const apiResponse = await phase2Api.post("/loginGoogle", {  // Renamed
+        const apiResponse = await phase2Api.post("/loginGoogle", {  
             googleAccessToken: googleResponse.credential
         })
 
@@ -22,7 +22,7 @@ export default function LoginPage() {
         localStorage.setItem("access_token", token)
         navigate('/clothingItems')
     } catch (error) {
-        console.error('Google login error:', error);  // Add this for debugging
+        console.error('Google login error:', error); 
         window.Swal.fire({
             icon: "error",
             title: "Something Went Wrong",
@@ -61,9 +61,9 @@ export default function LoginPage() {
         });
         google.accounts.id.renderButton(
             document.getElementById("buttonDiv"),
-            { theme: "outline", size: "large" }  // customization attributes
+            { theme: "outline", size: "large" }  
         );
-        google.accounts.id.prompt(); // also display the One Tap dialog
+        google.accounts.id.prompt(); 
     }, [])
 
     return (
@@ -157,7 +157,7 @@ export default function LoginPage() {
                                 </button>
                             </div>
 
-                            {/* Divider */}
+                      
                             <div className="d-flex align-items-center my-3">
                                 <hr style={{ flex: 1, borderColor: '#ddd' }} />
                                 <span style={{
@@ -170,7 +170,7 @@ export default function LoginPage() {
                                 <hr style={{ flex: 1, borderColor: '#ddd' }} />
                             </div>
 
-                            {/* Google Sign In Button */}
+                           
                             <div className="d-flex justify-content-center">
                                 <div id="buttonDiv"></div>
                             </div>

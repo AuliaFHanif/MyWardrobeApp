@@ -78,67 +78,80 @@ class Clothing {
     }
   }
 
-  static async getClothingItemPersonal(req, res, next) {
+static async getClothingItemPersonal(req, res, next) {
     try {
-      const bearerToken = req.headers.authorization;
-      const accessToken = bearerToken.split(" ")[1];
-      const data = verifyToken(accessToken);
-      const category = req.query.category || "";
-      const brand_id = req.query.brand_id || "";
-      const color_id = req.query.color_id || "";
-      const sortBy = req.query.sort || "createdAt";
-      const sortOrder = req.query.order || "DESC";
-      const page = parseInt(req.query.page) || 1;
-      const limit = parseInt(req.query.limit) || 12;
-      const offset = (page - 1) * limit;
+        const bearerToken = req.headers.authorization;
+        const accessToken = bearerToken.split(" ")[1];
+        // Ensure you have access to the verifyToken function
+        const data = verifyToken(accessToken); 
+        
+        // --- Input Parameters (Filters and Pagination) ---
+        const category = req.query.category || "";
+        const brand_id = req.query.brand_id || "";
+        const color_id = req.query.color_id || "";
+        const sortBy = req.query.sort || "createdAt";
+        const sortOrder = req.query.order || "DESC";
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 12;
+        const offset = (page - 1) * limit;
 
-      const clothingItems = await ClothingItem.findAll({
-        limit,
-        offset,
-        where: { user_id: data.id },
-        order: [[sortBy, sortOrder]],
-        attributes: { exclude: ["user_id", "brand_id", "type_id", "color_id"] },
-        include: [
-          {
-            model: ClothingType,
-            as: "type",
-            attributes: ["type_name", "category"],
-            where: category ? { category: category } : undefined,
-            required: !!category,
-          },
-          {
-            model: Brand,
-            as: "brand",
-            attributes: ["brand_name"],
-            where: brand_id ? { id: brand_id } : undefined,
-            required: !!brand_id,
-          },
-          {
-            model: Color,
-            as: "color",
-            attributes: ["color_name", "hex_code"],
-            where: color_id ? { id: color_id } : undefined,
-            required: !!color_id,
-          },
-          {
-            model: User,
-            as: "user",
-            attributes: ["first_name", "last_name"],
-          },
-          {
-            model: Occasion,
-            as: "occasions",
-            attributes: ["occasion_name"],
-            through: { attributes: [] },
-          },
-        ],
-      });
-      res.status(200).json(clothingItems);
+        // --- Execute Query with FindAndCountAll ---
+        // findAndCountAll returns an object: { count: totalItems, rows: clothingItems }
+        const { count: totalItems, rows: clothingItems } = await ClothingItem.findAndCountAll({
+            limit,
+            offset,
+            where: { user_id: data.id }, // Security: Filter by logged-in user ID
+            order: [[sortBy, sortOrder]],
+            attributes: { exclude: ["user_id", "brand_id", "type_id", "color_id"] },
+            include: [
+                {
+                    model: ClothingType,
+                    as: "type",
+                    attributes: ["type_name", "category"],
+                    where: category ? { category: category } : undefined,
+                    required: !!category,
+                },
+                {
+                    model: Brand,
+                    as: "brand",
+                    attributes: ["brand_name"],
+                    where: brand_id ? { id: brand_id } : undefined,
+                    required: !!brand_id,
+                },
+                {
+                    model: Color,
+                    as: "color",
+                    attributes: ["color_name", "hex_code"],
+                    where: color_id ? { id: color_id } : undefined,
+                    required: !!color_id,
+                },
+                {
+                    model: User,
+                    as: "user",
+                    attributes: ["first_name", "last_name"],
+                },
+                {
+                    model: Occasion,
+                    as: "occasions",
+                    attributes: ["occasion_name"],
+                    through: { attributes: [] },
+                },
+            ],
+        });
+
+        // 3. Return the items AND the total count
+        res.status(200).json({
+            items: clothingItems,
+            totalItems: totalItems,
+            currentPage: page,
+            limit: limit
+        });
+
     } catch (error) {
-      console.log(error);
-      res.status(500).json({ error: error.message });
+        console.error("Error in getClothingItemPersonal:", error);
+        res.status(500).json({ error: error.message });
     }
-  }
+}
 
   static async getClothingItemDetail(req, res, next) {
     try {
@@ -211,35 +224,53 @@ class Clothing {
 
   static async editClothingItem(req, res, next) {
     try {
-      const itemId = req.params.id;
-      const {
-        type_id,
-        brand_id,
-        color_id,
-        size,
-        material,
-        last_used,
-        image_url,
-      } = req.body;
-      const bearerToken = req.headers.authorization;
-      const accessToken = bearerToken.split(" ")[1];
-      const data = verifyToken(accessToken);
-      await ClothingItem.update({ where: { id: itemId } }, {
-        user_id: data.id,
-        type_id,
-        brand_id,
-        color_id,
-        size,
-        material,
-        last_used,
-        image_url,
-      });
-      res.status(201).json({ message: "Clothing item added successfully" });
+        const itemId = req.params.id;
+        const {
+            type_id,
+            brand_id,
+            color_id,
+            size,
+            material,
+            last_used,
+            image_url,
+            notes 
+        } = req.body;
+
+        const bearerToken = req.headers.authorization;
+        const accessToken = bearerToken.split(" ")[1];
+        const data = verifyToken(accessToken);
+
+        const [updatedRows] = await ClothingItem.update(
+            {
+                type_id,
+                brand_id,
+                color_id,
+                size,
+                material,
+                last_used,
+                image_url,
+                notes
+
+            },
+            {
+                where: {
+                    id: itemId,
+                    user_id: data.id 
+                }
+            }
+        );
+
+        if (updatedRows === 0) {
+            return res.status(404).json({ message: "Item not found/you are not authorized to edit it" });
+        }
+
+        res.status(200).json({ message: "Clothing item updated successfully" });
+
     } catch (error) {
-      console.log(error);
-      res.status(500).json({ error: error.message });
+        console.log(error);
+        res.status(500).json({ error: error.message });
     }
-  }
+}
 
   static async deleteClothingItem(req, res, next) {
     try {

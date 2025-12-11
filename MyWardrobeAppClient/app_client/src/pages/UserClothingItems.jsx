@@ -5,6 +5,7 @@ import Search from '../components/Search'
 
 function UserClothingItems() {
     const [items, setItems] = useState([])
+    const [totalItems, setTotalItems] = useState(0) 
     const [categoryFilter, setCategoryFilter] = useState("")
     const [brandFilter, setBrandFilter] = useState("")
     const [colorFilter, setColorFilter] = useState("")
@@ -13,18 +14,19 @@ function UserClothingItems() {
     const itemsPerPage = 12
 
     const handleDelete = async (id) => {
-            try {
-                await phase2Api.delete(`/clothing/${id}`, {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("access_token")}`
-                    }
-                });
-                // refetch current list after successful delete
-                fetchData(categoryFilter, sortOrder, currentPage, brandFilter, colorFilter)
-            } catch (err) {
-                console.log(err);
-            }
+        try {
+           
+            await phase2Api.delete(`/clothing/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("access_token")}`
+                }
+            });
+           
+            fetchData(categoryFilter, sortOrder, currentPage, brandFilter, colorFilter) 
+        } catch (err) {
+            console.log(err);
         }
+    }
 
     const fetchData = async (category = "", sort = "DESC", page = 1, brand_id = "", color_id = "") => {
         try {
@@ -44,7 +46,11 @@ function UserClothingItems() {
                     Authorization: `Bearer ${localStorage.getItem("access_token")}`
                 }
             })
-            setItems(data)
+            
+       
+            setItems(data.items)
+            setTotalItems(data.totalItems)
+           
         } catch (error) {
             console.log(error)
         }
@@ -68,6 +74,9 @@ function UserClothingItems() {
     useEffect(() => {
         fetchData(categoryFilter, sortOrder, currentPage, brandFilter, colorFilter)
     }, [])
+    
+    
+    const totalPages = Math.ceil(totalItems / itemsPerPage)
 
     return (
         <>
@@ -105,7 +114,7 @@ function UserClothingItems() {
                             <p className="text-center text-muted">No clothing items found</p>
                         )}
 
-                        {items.length > 0 && (
+                        {totalItems > itemsPerPage && ( 
                             <div className="d-flex justify-content-center align-items-center gap-2 mt-4">
                                 <button
                                     className="btn btn-sm btn-outline-secondary"
@@ -115,12 +124,12 @@ function UserClothingItems() {
                                     Previous
                                 </button>
 
-                                <span className="mx-2">Page {currentPage}</span>
+                                <span className="mx-2">Page {currentPage} of {totalPages}</span>
 
                                 <button
                                     className="btn btn-sm btn-outline-secondary"
                                     onClick={() => handlePageChange(currentPage + 1)}
-                                    disabled={items.length < itemsPerPage}
+                                    disabled={currentPage >= totalPages} 
                                 >
                                     Next
                                 </button>
