@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { phase2Api } from '../helpers/http.client'
-import { Navigate, useNavigate } from "react-router"
+import { Navigate, useNavigate, Link } from "react-router"
 
 export default function LoginPage() {
     let navigate = useNavigate()
@@ -43,7 +43,7 @@ export default function LoginPage() {
                         fontWeight: 'bold',
                         color: '#333'
                     }}>
-                        Welcome To Restaurant App
+                        Welcome To MyWardrobe App
                     </h3>
                     <div style={{
                         backgroundColor: '#FFE8CD',
@@ -119,6 +119,33 @@ export default function LoginPage() {
                                 </button>
                             </div>
                         </form>
+                        <Link
+                            to="/clothingItems"
+                            className="btn w-100 mt-3"
+                            style={{
+                                padding: '0.75rem',
+                                fontSize: '1.1rem',
+                                fontWeight: '600',
+                                borderRadius: '8px',
+                                backgroundColor: '#f8f9fa',
+                                border: '2px solid #007bff',
+                                color: '#007bff',
+                                textDecoration: 'none',
+                                display: 'block',
+                                textAlign: 'center',
+                                transition: 'all 0.3s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.target.style.backgroundColor = '#007bff';
+                                e.target.style.color = '#fff';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.target.style.backgroundColor = '#f8f9fa';
+                                e.target.style.color = '#007bff';
+                            }}
+                        >
+                            Go back to homepage
+                        </Link>
                     </div>
                 </div>
             </div>

@@ -34,6 +34,8 @@ app.use(authentication)
 app.post('/add-user', verifyRole, Users.createUser)
 
 app.get('/clothing', Clothing.getClothingItemPersonal);
+app.get('/clothing/suggestions', Clothing.getOutfitSuggestions);
+app.get('/clothing/suggestionsDummy', Clothing.getOutfitSuggestionsDummy);
 app.post('/clothing/add', Clothing.addClothingItem);
 app.put('/clothing/:id', verifyRole, Clothing.editClothingItem);
 app.delete('/clothing/:id', verifyRole, Clothing.deleteClothingItem);

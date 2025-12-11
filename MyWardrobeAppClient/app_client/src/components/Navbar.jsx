@@ -55,6 +55,16 @@ export default function Navbar() {
                                 Add Clothing Item
                             </Link>
                         </li>
+                        <li className="nav-item">
+                            <Link className="nav-link fw-semibold" aria-current="page" to="/clothingItems/outfitSuggestions" style={{ color: '#6B3410' }}>
+                                Outfit suggestions
+                            </Link>
+                        </li>
+                        <li className="nav-item">
+                            <Link className="nav-link fw-semibold" aria-current="page" to="/admin" style={{ color: '#6B3410' }}>
+                                Admin dashboard
+                            </Link>
+                        </li>
                     </ul>
                     {isAuthenticated ? (
                         <button
