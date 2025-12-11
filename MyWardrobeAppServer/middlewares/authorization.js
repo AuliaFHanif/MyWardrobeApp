@@ -5,7 +5,7 @@ module.exports = function verifyRole(req, res, next) {
         if (req.user.role === "Admin") {
             next()
 
-        } else if (req.user.role === "Staff") {
+        } else if (req.user.role === "familyMember") {
             req.access = req.user.id
             next()
         } else {
