@@ -43,7 +43,7 @@ export default function LoginPage() {
 
             const token = response.data.access_token
             localStorage.setItem("access_token", token)
-            navigate('/clothingItems/myItems')
+            navigate('/clothingItems')
         } catch (error) {
             window.Swal.fire({
                 icon: "error",

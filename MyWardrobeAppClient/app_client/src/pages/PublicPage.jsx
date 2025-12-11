@@ -2,57 +2,65 @@ import { useEffect, useState } from 'react'
 import PublicItemCards from '../components/PublicItemCards.jsx'
 import { phase2Api } from '../helpers/http.client'
 import Search from '../components/Search'
+import { useSelector, useDispatch } from 'react-redux'
+import { fetchPublicItems, setFilters, setCurrentPage } from '../features/clothing/publicItemsSlice'
 
 function PublicPage() {
-    const [items, setItems] = useState([])
-    const [categoryFilter, setCategoryFilter] = useState("")
-    const [brandFilter, setBrandFilter] = useState("")
-    const [colorFilter, setColorFilter] = useState("")
-    const [sortOrder, setSortOrder] = useState("DESC")
-    const [currentPage, setCurrentPage] = useState(1)
-    const itemsPerPage = 12
-    const fetchData = async (category = "", sort = "DESC", page = 1, brand_id = "", color_id = "") => {
-        try {
-            const params = {
-                page: page,
-                limit: itemsPerPage,
-                sort: 'createdAt',
-                order: sort
-            }
-            if (category) params.category = category
-            if (brand_id) params.brand_id = brand_id
-            if (color_id) params.color_id = color_id
+    const dispatch = useDispatch()
+    
+    
+    const { 
+        items, 
+        status, 
+        error,
+        categoryFilter, 
+        brandFilter, 
+        colorFilter, 
+        sortOrder, 
+        currentPage,
+        itemsPerPage
+    } = useSelector((state) => state.publicItems)
 
-            const { data } = await phase2Api.get('/pub/clothingItems', {
-                params: params,
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("access_token")}`
-                }
-            })
-            setItems(data)
-        } catch (error) {
-            console.log(error)
-        }
+   
+    const getCurrentParams = (pageOverride = currentPage) => ({
+        category: categoryFilter,
+        sort: sortOrder,
+        page: pageOverride,
+        brand_id: brandFilter,
+        color_id: colorFilter
+    })
+
+   
+    const handleFetch = (filters) => {
+        dispatch(fetchPublicItems(filters))
     }
 
+   
     const handlePageChange = (pageNumber) => {
-        setCurrentPage(pageNumber)
-        fetchData(categoryFilter, sortOrder, pageNumber, brandFilter, colorFilter)
+        dispatch(setCurrentPage(pageNumber)) 
+        handleFetch(getCurrentParams(pageNumber)) 
         window.scrollTo({ top: 0, behavior: 'smooth' })
     }
 
-    const handleSearch = (category = "", sort = "DESC", page = 1, brand_id = "", color_id = "") => {
-        setCategoryFilter(category)
-        setSortOrder(sort)
-        setBrandFilter(brand_id)
-        setColorFilter(color_id)
-        setCurrentPage(1)
-        fetchData(category, sort, 1, brand_id, color_id)
+    
+    const handleSearch = (category = "", sort = "DESC", page, brand_id = "", color_id = "") => {
+        
+        dispatch(setFilters({ category, sort, brand_id, color_id }))
+        
+      
+        handleFetch({ 
+            category, 
+            sort, 
+            page: 1, 
+            brand_id, 
+            color_id 
+        })
     }
 
+
     useEffect(() => {
-        fetchData(categoryFilter, sortOrder, currentPage, brandFilter, colorFilter)
-    }, [])
+        handleFetch(getCurrentParams())
+    }, []) 
 
     return (
         <>
