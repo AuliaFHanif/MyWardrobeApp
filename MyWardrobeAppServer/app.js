@@ -39,6 +39,7 @@ app.get('/clothing/suggestionsDummy', Clothing.getOutfitSuggestionsDummy);
 app.post('/clothing/add', Clothing.addClothingItem);
 app.put('/clothing/:id', verifyRole, Clothing.editClothingItem);
 app.delete('/clothing/:id', verifyRole, Clothing.deleteClothingItem);
+app.post('/clothing/last-used', Clothing.updateLastUsed);
 app.patch("/clothing/:id/cover-url", verifyRole, upload.single('imgUrl'), Clothing.editClothingItemImage);
 
 

@@ -295,7 +295,7 @@ class Clothing {
       // Get user's wardrobe with related data
       const userOutfits = await ClothingItem.findAll({
         where: { user_id: userId },
-        attributes: ["id", "size", "material", "notes"],
+        attributes: ["id", "size", "material", "notes", "image_url"],
         include: [
           {
             model: ClothingType,
@@ -448,136 +448,218 @@ Return ONLY a valid JSON array with this exact format (no markdown, no extra tex
     }
   }
 
+  static async updateLastUsed(req, res, next) {
+    try {
+        // 1. Get the array of IDs from the request body
+        const { itemIds } = req.body;
+
+        // Input validation: Ensure itemIds is an array and not empty
+        if (!Array.isArray(itemIds) || itemIds.length === 0) {
+            return res.status(400).json({ error: "itemIds array is required." });
+        }
+
+        // 2. Perform the update using Sequelize's Model.update method
+        const [affectedRows] = await ClothingItem.update(
+            { last_used: new Date() }, // 1st Argument: The new values to set
+            { 
+                where: { 
+                    id: itemIds // 2nd Argument: The WHERE clause (id IN (itemIds))
+                } 
+            }
+        );
+
+        // Optional: Check if any rows were actually updated
+        if (affectedRows === 0) {
+             return res.status(404).json({ message: "No items found or updated." });
+        }
+
+        res.status(200).json({ 
+            message: "Last used dates updated successfully",
+            updatedCount: affectedRows
+        });
+
+    } catch (error) {
+        console.error("Error updating last used date:", error);
+        // Respond with a detailed error message (for debugging)
+        res.status(500).json({ 
+            error: "Failed to update last used dates.",
+            details: error.message 
+        });
+    }
+}
+
   static async getOutfitSuggestionsDummy(req, res, next) {
     try {
       
       res.status(200).json({
     "success": true,
     "criteria": {
-        "occasion": "Party",
-        "weather": "Warm evening",
-        "stylePreference": "Elegant and sophisticated"
+        "occasion": "Date Night",
+        "weather": "Mild evening",
+        "stylePreference": "Romantic and stylish"
     },
     "suggestions": [
         {
-            "outfit_name": "Casual Chic Skirt Look",
+            "outfit_name": "Evening Elegance",
             "items": [
-                11,
-                46,
-                13
+                38,
+                5,
+                34,
+                6
             ],
-            "description": "This outfit leverages the Light Blue Skirt to offer a slightly more feminine and relaxed 'party' feel suitable for a warm evening. The solid Red T-Shirt adds a vibrant pop of color, making it appropriate for an informal gathering.",
-            "style_tips": "While not achieving true elegance with the current wardrobe, tucking the Red T-Shirt neatly into the skirt can create a more polished silhouette. The White Sneakers maintain comfort and a casual-chic appeal, ideal for a relaxed atmosphere.",
+            "description": "This outfit combines the soft sophistication of the light gray blouse with the classic appeal of navy jeans, elevated by a sharp navy blazer. The color palette is understated yet chic, perfect for a romantic evening. The blouse adds a touch of fluidity and elegance, while the blazer provides structure and warmth for a mild evening.",
+            "style_tips": "Tuck the blouse neatly into the jeans for a polished silhouette. Roll up the blazer sleeves slightly to reveal your wrists for a relaxed yet stylish touch. While black sneakers aren't typically 'romantic,' choose the sleekest pair and ensure they are impeccably clean to maintain a sophisticated casual vibe. Consider minimalist accessories to complete the refined look.",
             "itemDetails": [
                 {
-                    "id": 11,
-                    "name": "Red T-Shirt",
-                    "brand": "Nike",
+                    "id": 38,
+                    "name": "Light Gray Blouse",
+                    "brand": "Erigo",
                     "category": "Tops",
-                    "color": "Red",
+                    "color": "Light Gray",
                     "size": "M",
-                    "notes": "Red casual t-shirt"
+                    "image_url": "https://picsum.photos/400?random=4",
+                    "notes": "Work polo shirt"
                 },
                 {
-                    "id": 46,
-                    "name": "Light Blue Skirt",
-                    "brand": "Consina",
-                    "category": "Bottoms",
-                    "color": "Light Blue",
-                    "size": "30",
-                    "notes": "Black shorts"
-                },
-                {
-                    "id": 13,
-                    "name": "White Sneakers",
-                    "brand": "Specs",
-                    "category": "Footwear",
-                    "color": "White",
-                    "size": "42",
-                    "notes": "Soccer cleats"
-                }
-            ]
-        },
-        {
-            "outfit_name": "Smart Casual Chinos Ensemble",
-            "items": [
-                25,
-                48,
-                27
-            ],
-            "description": "Designed for a relaxed evening party, this outfit utilizes the Navy Blue Chinos to provide a smart-casual base. Paired with a Red T-Shirt, it offers a comfortable yet put-together look for warmer temperatures and informal social events.",
-            "style_tips": "To elevate this simple combination, ensure the Red T-Shirt is well-fitted and consider a neat half-tuck or full tuck. This ensemble prioritizes comfort and a clean appearance, best suited for very informal gatherings rather than a formal party setting.",
-            "itemDetails": [
-                {
-                    "id": 25,
-                    "name": "Red T-Shirt",
-                    "brand": "Nike",
-                    "category": "Tops",
-                    "color": "Red",
-                    "size": "M",
-                    "notes": "Red casual t-shirt"
-                },
-                {
-                    "id": 48,
-                    "name": "Navy Blue Chinos",
+                    "id": 5,
+                    "name": "Navy Blue Jeans",
                     "brand": "Levi's",
                     "category": "Bottoms",
                     "color": "Navy Blue",
-                    "size": "L",
-                    "notes": "Gray hoodie"
+                    "size": "34",
+                    "image_url": "https://picsum.photos/400?random=5",
+                    "notes": "Classic blue jeans"
                 },
                 {
-                    "id": 27,
-                    "name": "White Sneakers",
-                    "brand": "Specs",
+                    "id": 34,
+                    "name": "Navy Blue Blazer",
+                    "brand": "Lacoste",
+                    "category": "Outerwear",
+                    "color": "Navy Blue",
+                    "size": "L",
+                    "image_url": "https://picsum.photos/400?random=20",
+                    "notes": "Navy blue blazer for presentations"
+                },
+                {
+                    "id": 6,
+                    "name": "Black Sneakers",
+                    "brand": "This Is April",
                     "category": "Footwear",
-                    "color": "White",
-                    "size": "42",
-                    "notes": "Soccer cleats"
+                    "color": "Black",
+                    "size": "43",
+                    "image_url": "https://picsum.photos/400?random=6",
+                    "notes": "Formal dress shoes"
                 }
             ]
         },
         {
-            "outfit_name": "Monochromatic Sporty-Casual",
+            "outfit_name": "Polished Charm",
             "items": [
-                33,
-                12,
-                13
+                4,
+                5,
+                34,
+                20
             ],
-            "description": "This outfit presents a sleek, monochromatic black base for a very casual evening gathering. The Black Activewear Top and Black Shorts create a streamlined, modern aesthetic that is comfortable for warm weather, leaning into a sporty-chic vibe.",
-            "style_tips": "Given the activewear nature, focus on clean lines and a well-fitted silhouette to make it appear more intentional. This look is inherently casual and best suited for an extremely informal party or outdoor activity where comfort is key, rather than an elegant event.",
+            "description": "A fresh and confident choice, this outfit pairs a crisp white polo shirt with navy blue jeans. The addition of the navy blazer instantly transforms this business-casual staple into a stylish date night ensemble. It's a clean, classic, and put-together look that is both approachable and refined, suitable for a mild evening.",
+            "style_tips": "For a 'romantic and stylish' feel, ensure the polo is well-fitted and possibly worn untucked if it's a shorter cut, or a neat half-tuck. Layer the blazer over the polo for an intelligent, refined appearance. The black leather sneakers, despite their 'formal' tag, can lend a modern, smart-casual edge if kept pristine. Add a belt that complements the sneakers for cohesion.",
             "itemDetails": [
                 {
-                    "id": 33,
-                    "name": "Black Activewear Top",
-                    "brand": "League",
-                    "category": "Activewear",
-                    "color": "Black",
-                    "size": "M",
-                    "notes": "Athletic workout top"
-                },
-                {
-                    "id": 12,
-                    "name": "Black Shorts",
-                    "brand": "3Second",
-                    "category": "Bottoms",
-                    "color": "Black",
-                    "size": "30",
-                    "notes": "Black shorts"
-                },
-                {
-                    "id": 13,
-                    "name": "White Sneakers",
-                    "brand": "Specs",
-                    "category": "Footwear",
+                    "id": 4,
+                    "name": "White Polo Shirt",
+                    "brand": "Polo Ralph Lauren",
+                    "category": "Tops",
                     "color": "White",
-                    "size": "42",
-                    "notes": "Soccer cleats"
+                    "size": "L",
+                    "image_url": "https://picsum.photos/400?random=4",
+                    "notes": "Work polo shirt"
+                },
+                {
+                    "id": 5,
+                    "name": "Navy Blue Jeans",
+                    "brand": "Levi's",
+                    "category": "Bottoms",
+                    "color": "Navy Blue",
+                    "size": "34",
+                    "image_url": "https://picsum.photos/400?random=5",
+                    "notes": "Classic blue jeans"
+                },
+                {
+                    "id": 34,
+                    "name": "Navy Blue Blazer",
+                    "brand": "Lacoste",
+                    "category": "Outerwear",
+                    "color": "Navy Blue",
+                    "size": "L",
+                    "image_url": "https://picsum.photos/400?random=20",
+                    "notes": "Navy blue blazer for presentations"
+                },
+                {
+                    "id": 20,
+                    "name": "Black Sneakers",
+                    "brand": "This Is April",
+                    "category": "Footwear",
+                    "color": "Black",
+                    "size": "43",
+                    "image_url": "https://picsum.photos/400?random=6",
+                    "notes": "Formal dress shoes"
+                }
+            ]
+        },
+        {
+            "outfit_name": "Modern Romantic",
+            "items": [
+                40,
+                5,
+                34,
+                6
+            ],
+            "description": "This look focuses on a striking red sweater, a color often associated with romance, paired with classic navy jeans. The unusual 'leather' material of the sweater, if sleek, adds an edgy and luxurious texture, making it uniquely stylish. Layering the navy blazer over the sweater provides structure, warmth, and a sophisticated contrast, ideal for a mild evening date.",
+            "style_tips": "Let the red sweater be the focal point of this outfit. Depending on the sweater's cut, you might wear it slightly oversized for a cozy-chic feel, or fitted for a sharper look. If the 'leather' material is substantial, ensure the blazer fits comfortably over it. The black sneakers ground the vibrant top, creating a balanced and modern aesthetic. Keep accessories minimal to let the rich color and texture shine.",
+            "itemDetails": [
+                {
+                    "id": 40,
+                    "name": "Red Sweater",
+                    "brand": "Greenlight",
+                    "category": "Tops",
+                    "color": "Red",
+                    "size": "43",
+                    "image_url": "https://picsum.photos/400?random=6",
+                    "notes": "Formal dress shoes"
+                },
+                {
+                    "id": 5,
+                    "name": "Navy Blue Jeans",
+                    "brand": "Levi's",
+                    "category": "Bottoms",
+                    "color": "Navy Blue",
+                    "size": "34",
+                    "image_url": "https://picsum.photos/400?random=5",
+                    "notes": "Classic blue jeans"
+                },
+                {
+                    "id": 34,
+                    "name": "Navy Blue Blazer",
+                    "brand": "Lacoste",
+                    "category": "Outerwear",
+                    "color": "Navy Blue",
+                    "size": "L",
+                    "image_url": "https://picsum.photos/400?random=20",
+                    "notes": "Navy blue blazer for presentations"
+                },
+                {
+                    "id": 6,
+                    "name": "Black Sneakers",
+                    "brand": "This Is April",
+                    "category": "Footwear",
+                    "color": "Black",
+                    "size": "43",
+                    "image_url": "https://picsum.photos/400?random=6",
+                    "notes": "Formal dress shoes"
                 }
             ]
         }
     ],
-    "wardrobeSize": 13
+    "wardrobeSize": 11
 });
     } catch (error) {
       console.log(error);
