@@ -1,3 +1,5 @@
+// Clothing.js (Controller File)
+
 const {
   ClothingItem,
   ClothingType,
@@ -9,15 +11,47 @@ const {
 const { v2: cloudinary } = require("cloudinary");
 const { verifyToken } = require("../helpers/jwt");
 const { GoogleGenAI } = require("@google/genai");
+const axios = require('axios'); // For making HTTP requests to OpenWeatherMap
 
 
+// --- EXTERNAL SERVICE CONFIGURATION ---
+
+// Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+// OpenWeatherMap
+const OPENWEATHER_API_KEY = process.env.OPENWEATHER_API_KEY;
+const OPENWEATHER_BASE_URL = 'https://api.openweathermap.org/data/2.5/weather';
+
+
 class Clothing {
+
+
+  static async fetchWeatherData(lat, lon) {
+    try {
+      const response = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${process.env.OPENWEATHER_API_KEY}&units=metric`
+      );
+
+      const data = await response.json();
+
+      return {
+        location: data.name,
+        temperature: data.main.temp,
+        feelsLike: data.main.feels_like,
+        condition: data.weather[0].main,
+        description: data.weather[0].description,
+      };
+    } catch (error) {
+      console.error('Weather fetch error:', error);
+      return null;
+    }
+  }
+
   static async getClothingItemPublic(req, res, next) {
     try {
       const category = req.query.category || "";
@@ -78,80 +112,78 @@ class Clothing {
     }
   }
 
-static async getClothingItemPersonal(req, res, next) {
+  static async getClothingItemPersonal(req, res, next) {
     try {
-        const bearerToken = req.headers.authorization;
-        const accessToken = bearerToken.split(" ")[1];
-        // Ensure you have access to the verifyToken function
-        const data = verifyToken(accessToken); 
-        
-        // --- Input Parameters (Filters and Pagination) ---
-        const category = req.query.category || "";
-        const brand_id = req.query.brand_id || "";
-        const color_id = req.query.color_id || "";
-        const sortBy = req.query.sort || "createdAt";
-        const sortOrder = req.query.order || "DESC";
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 12;
-        const offset = (page - 1) * limit;
+      const bearerToken = req.headers.authorization;
+      const accessToken = bearerToken.split(" ")[1];
+      const data = verifyToken(accessToken);
 
-        // --- Execute Query with FindAndCountAll ---
-        // findAndCountAll returns an object: { count: totalItems, rows: clothingItems }
-        const { count: totalItems, rows: clothingItems } = await ClothingItem.findAndCountAll({
-            limit,
-            offset,
-            where: { user_id: data.id }, // Security: Filter by logged-in user ID
-            order: [[sortBy, sortOrder]],
-            attributes: { exclude: ["user_id", "brand_id", "type_id", "color_id"] },
-            include: [
-                {
-                    model: ClothingType,
-                    as: "type",
-                    attributes: ["type_name", "category"],
-                    where: category ? { category: category } : undefined,
-                    required: !!category,
-                },
-                {
-                    model: Brand,
-                    as: "brand",
-                    attributes: ["brand_name"],
-                    where: brand_id ? { id: brand_id } : undefined,
-                    required: !!brand_id,
-                },
-                {
-                    model: Color,
-                    as: "color",
-                    attributes: ["color_name", "hex_code"],
-                    where: color_id ? { id: color_id } : undefined,
-                    required: !!color_id,
-                },
-                {
-                    model: User,
-                    as: "user",
-                    attributes: ["first_name", "last_name"],
-                },
-                {
-                    model: Occasion,
-                    as: "occasions",
-                    attributes: ["occasion_name"],
-                    through: { attributes: [] },
-                },
-            ],
-        });
+      // --- Input Parameters (Filters and Pagination) ---
+      const category = req.query.category || "";
+      const brand_id = req.query.brand_id || "";
+      const color_id = req.query.color_id || "";
+      const sortBy = req.query.sort || "createdAt";
+      const sortOrder = req.query.order || "DESC";
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 12;
+      const offset = (page - 1) * limit;
 
-        // 3. Return the items AND the total count
-        res.status(200).json({
-            items: clothingItems,
-            totalItems: totalItems,
-            currentPage: page,
-            limit: limit
-        });
+      // --- Execute Query with FindAndCountAll ---
+      const { count: totalItems, rows: clothingItems } = await ClothingItem.findAndCountAll({
+        limit,
+        offset,
+        where: { user_id: data.id }, // Security: Filter by logged-in user ID
+        order: [[sortBy, sortOrder]],
+        attributes: { exclude: ["user_id", "brand_id", "type_id", "color_id"] },
+        include: [
+          {
+            model: ClothingType,
+            as: "type",
+            attributes: ["type_name", "category"],
+            where: category ? { category: category } : undefined,
+            required: !!category,
+          },
+          {
+            model: Brand,
+            as: "brand",
+            attributes: ["brand_name"],
+            where: brand_id ? { id: brand_id } : undefined,
+            required: !!brand_id,
+          },
+          {
+            model: Color,
+            as: "color",
+            attributes: ["color_name", "hex_code"],
+            where: color_id ? { id: color_id } : undefined,
+            required: !!color_id,
+          },
+          {
+            model: User,
+            as: "user",
+            attributes: ["first_name", "last_name"],
+          },
+          {
+            model: Occasion,
+            as: "occasions",
+            attributes: ["occasion_name"],
+            through: { attributes: [] },
+          },
+        ],
+      });
+
+      // 3. Return the items AND the total count
+      res.status(200).json({
+        items: clothingItems,
+        totalItems: totalItems,
+        currentPage: page,
+        limit: limit
+      });
 
     } catch (error) {
-        console.error("Error in getClothingItemPersonal:", error);
-        res.status(500).json({ error: error.message });
+      console.error("Error in getClothingItemPersonal:", error);
+      res.status(500).json({ error: error.message });
     }
-}
+  }
 
   static async getClothingItemDetail(req, res, next) {
     try {
@@ -188,7 +220,7 @@ static async getClothingItemPersonal(req, res, next) {
         ],
       });
       res.status(200).json(itemDetails);
-    } catch (error) { }
+    } catch (error) { next(error) } // Added next(error) for consistency
   }
 
   static async addClothingItem(req, res, next) {
@@ -224,53 +256,53 @@ static async getClothingItemPersonal(req, res, next) {
 
   static async editClothingItem(req, res, next) {
     try {
-        const itemId = req.params.id;
-        const {
-            type_id,
-            brand_id,
-            color_id,
-            size,
-            material,
-            last_used,
-            image_url,
-            notes 
-        } = req.body;
+      const itemId = req.params.id;
+      const {
+        type_id,
+        brand_id,
+        color_id,
+        size,
+        material,
+        last_used,
+        image_url,
+        notes
+      } = req.body;
 
-        const bearerToken = req.headers.authorization;
-        const accessToken = bearerToken.split(" ")[1];
-        const data = verifyToken(accessToken);
+      const bearerToken = req.headers.authorization;
+      const accessToken = bearerToken.split(" ")[1];
+      const data = verifyToken(accessToken);
 
-        const [updatedRows] = await ClothingItem.update(
-            {
-                type_id,
-                brand_id,
-                color_id,
-                size,
-                material,
-                last_used,
-                image_url,
-                notes
+      const [updatedRows] = await ClothingItem.update(
+        {
+          type_id,
+          brand_id,
+          color_id,
+          size,
+          material,
+          last_used,
+          image_url,
+          notes
 
-            },
-            {
-                where: {
-                    id: itemId,
-                    user_id: data.id 
-                }
-            }
-        );
-
-        if (updatedRows === 0) {
-            return res.status(404).json({ message: "Item not found/you are not authorized to edit it" });
+        },
+        {
+          where: {
+            id: itemId,
+            user_id: data.id
+          }
         }
+      );
 
-        res.status(200).json({ message: "Clothing item updated successfully" });
+      if (updatedRows === 0) {
+        return res.status(404).json({ message: "Item not found/you are not authorized to edit it" });
+      }
+
+      res.status(200).json({ message: "Clothing item updated successfully" });
 
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ error: error.message });
+      console.log(error);
+      res.status(500).json({ error: error.message });
     }
-}
+  }
 
   static async deleteClothingItem(req, res, next) {
     try {
@@ -312,15 +344,42 @@ static async getClothingItemPersonal(req, res, next) {
     }
   }
 
+
+
   static async getOutfitSuggestions(req, res, next) {
     try {
-      const { occasion, weather, stylePreference, userId } = req.body;
+      // Extract userId from JWT token
+      const bearerToken = req.headers.authorization;
+      const accessToken = bearerToken.split(" ")[1];
+      const userData = verifyToken(accessToken);
+      const userId = userData.id;
+
+      // Get data from request body
+      const { occasion, weather: inputWeather, stylePreference, lat, lon } = req.body;
+      let weatherData = null;
 
       // Validate input
-      if (!occasion || !userId) {
-        return res.status(400).json({ 
-          error: 'Occasion and userId are required' 
+      if (!occasion) {
+        return res.status(400).json({
+          error: 'Occasion is required'
         });
+      }
+
+      console.log("Received coordinates:", lat, lon);
+
+      // 1. DYNAMICALLY FETCH WEATHER DATA if coordinates provided
+      if (lat && lon) {
+        weatherData = await Clothing.fetchWeatherData(parseFloat(lat), parseFloat(lon));
+      }
+
+      // Construct a detailed weather string for the AI prompt
+      let weatherPrompt = '';
+      if (inputWeather) {
+        // Use user's explicit input if provided
+        weatherPrompt = `- Weather: ${inputWeather}`;
+      } else if (weatherData) {
+        // Use dynamically fetched data if location was provided
+        weatherPrompt = `- Weather: ${weatherData.description} (${weatherData.temperature}°C, feels like ${weatherData.feelsLike}°C) in ${weatherData.location}`;
       }
 
       // Get user's wardrobe with related data
@@ -354,8 +413,8 @@ static async getClothingItemPersonal(req, res, next) {
 
       // Check if user has any clothes
       if (userOutfits.length === 0) {
-        return res.status(404).json({ 
-          error: 'No clothing items found for this user' 
+        return res.status(404).json({
+          error: 'No clothing items found for this user'
         });
       }
 
@@ -379,6 +438,12 @@ static async getClothingItemPersonal(req, res, next) {
         return acc;
       }, {});
 
+      // Validate Gemini API key
+      if (!process.env.GEMINI_API_KEY) {
+        console.error('GEMINI_API_KEY is not set in environment');
+        return res.status(500).json({ error: 'GEMINI_API_KEY is not configured on the server' });
+      }
+
       // Initialize Gemini AI
       const ai = new GoogleGenAI({
         apiKey: process.env.GEMINI_API_KEY
@@ -393,28 +458,29 @@ ${JSON.stringify(groupedItems, null, 2)}
 
 CRITERIA:
 - Occasion: ${occasion}
-${weather ? `- Weather: ${weather}` : ''}
+${weatherPrompt}
 ${stylePreference ? `- Style Preference: ${stylePreference}` : ''}
 
 INSTRUCTIONS:
 1. Create 3 different complete outfits
 2. Each outfit should include items from different categories (Tops, Bottoms, Footwear, etc.)
-3. Consider color coordination and style compatibility
-4. Only use item IDs from the provided wardrobe
-5. Ensure each outfit is appropriate for the "${occasion}" occasion
+3. Consider color coordination, material, and style compatibility
+4. **Crucially, ensure the outfit materials and layers are appropriate for the specified weather.**
+5. Only use item IDs from the provided wardrobe
+6. Ensure each outfit is appropriate for the "${occasion}" occasion
 
 Return ONLY a valid JSON array with this exact format (no markdown, no extra text):
 [
   {
     "outfit_name": "Outfit name here",
     "items": [1, 5, 12],
-    "description": "Why this outfit works for ${occasion}",
+    "description": "Why this outfit works for ${occasion} and the weather.",
     "style_tips": "Additional styling advice"
   }
 ]
 `;
 
-      // Call Gemini API using the models.generateContent pattern
+      // Call Gemini API
       const response = await ai.models.generateContent({
         model: "gemini-2.5-flash",
         contents: prompt,
@@ -431,9 +497,9 @@ Return ONLY a valid JSON array with this exact format (no markdown, no extra tex
         suggestions = JSON.parse(aiResponse);
       } catch (parseError) {
         console.error('Failed to parse AI response:', aiResponse);
-        return res.status(500).json({ 
+        return res.status(500).json({
           error: 'Failed to parse AI suggestions',
-          rawResponse: aiResponse 
+          rawResponse: aiResponse
         });
       }
 
@@ -459,11 +525,12 @@ Return ONLY a valid JSON array with this exact format (no markdown, no extra tex
         };
       });
 
+      // Return the enhanced suggestions
       res.status(200).json({
         success: true,
         criteria: {
           occasion,
-          weather: weather || 'Not specified',
+          weather: weatherData ? `${weatherData.description} (${weatherData.temperature}°C)` : inputWeather || 'Not specified',
           stylePreference: stylePreference || 'Not specified'
         },
         suggestions: enhancedSuggestions,
@@ -472,231 +539,239 @@ Return ONLY a valid JSON array with this exact format (no markdown, no extra tex
 
     } catch (error) {
       console.error('Outfit suggestion error:', error);
-      res.status(500).json({ 
+      // If the Google GenAI SDK returned a structured error, try to surface useful details
+      const detailed = (error && (error.message || (error.response && error.response.data))) || String(error);
+      // If the underlying service returned an API_KEY_INVALID message, forward that clearly
+      if (String(detailed).includes('API_KEY_INVALID')) {
+        return res.status(401).json({ error: 'API_KEY_INVALID', message: 'The provided Gemini API key is invalid or not authorized for this request' });
+      }
+
+      res.status(500).json({
         error: 'Failed to generate outfit suggestions',
-        message: error.message 
+        details: detailed
+      });
+    }
+  }
+  static async updateLastUsed(req, res, next) {
+    try {
+      // 1. Get the array of IDs from the request body
+      const { itemIds } = req.body;
+
+      // Input validation: Ensure itemIds is an array and not empty
+      if (!Array.isArray(itemIds) || itemIds.length === 0) {
+        return res.status(400).json({ error: "itemIds array is required." });
+      }
+
+      // 2. Perform the update using Sequelize's Model.update method
+      const [affectedRows] = await ClothingItem.update(
+        { last_used: new Date() }, // 1st Argument: The new values to set
+        {
+          where: {
+            id: itemIds // 2nd Argument: The WHERE clause (id IN (itemIds))
+          }
+        }
+      );
+
+      // Optional: Check if any rows were actually updated
+      if (affectedRows === 0) {
+        return res.status(404).json({ message: "No items found or updated." });
+      }
+
+      res.status(200).json({
+        message: "Last used dates updated successfully",
+        updatedCount: affectedRows
+      });
+
+    } catch (error) {
+      console.error("Error updating last used date:", error);
+      // Respond with a detailed error message (for debugging)
+      res.status(500).json({
+        error: "Failed to update last used dates.",
+        details: error.message
       });
     }
   }
 
-  static async updateLastUsed(req, res, next) {
-    try {
-        // 1. Get the array of IDs from the request body
-        const { itemIds } = req.body;
-
-        // Input validation: Ensure itemIds is an array and not empty
-        if (!Array.isArray(itemIds) || itemIds.length === 0) {
-            return res.status(400).json({ error: "itemIds array is required." });
-        }
-
-        // 2. Perform the update using Sequelize's Model.update method
-        const [affectedRows] = await ClothingItem.update(
-            { last_used: new Date() }, // 1st Argument: The new values to set
-            { 
-                where: { 
-                    id: itemIds // 2nd Argument: The WHERE clause (id IN (itemIds))
-                } 
-            }
-        );
-
-        // Optional: Check if any rows were actually updated
-        if (affectedRows === 0) {
-             return res.status(404).json({ message: "No items found or updated." });
-        }
-
-        res.status(200).json({ 
-            message: "Last used dates updated successfully",
-            updatedCount: affectedRows
-        });
-
-    } catch (error) {
-        console.error("Error updating last used date:", error);
-        // Respond with a detailed error message (for debugging)
-        res.status(500).json({ 
-            error: "Failed to update last used dates.",
-            details: error.message 
-        });
-    }
-}
-
   static async getOutfitSuggestionsDummy(req, res, next) {
     try {
-      
+
       res.status(200).json({
-    "success": true,
-    "criteria": {
-        "occasion": "Date Night",
-        "weather": "Mild evening",
-        "stylePreference": "Romantic and stylish"
-    },
-    "suggestions": [
-        {
+        "success": true,
+        "criteria": {
+          "occasion": "Date Night",
+          "weather": "Mild evening",
+          "stylePreference": "Romantic and stylish"
+        },
+        "suggestions": [
+          {
             "outfit_name": "Evening Elegance",
             "items": [
-                38,
-                5,
-                34,
-                6
+              38,
+              5,
+              34,
+              6
             ],
             "description": "This outfit combines the soft sophistication of the light gray blouse with the classic appeal of navy jeans, elevated by a sharp navy blazer. The color palette is understated yet chic, perfect for a romantic evening. The blouse adds a touch of fluidity and elegance, while the blazer provides structure and warmth for a mild evening.",
             "style_tips": "Tuck the blouse neatly into the jeans for a polished silhouette. Roll up the blazer sleeves slightly to reveal your wrists for a relaxed yet stylish touch. While black sneakers aren't typically 'romantic,' choose the sleekest pair and ensure they are impeccably clean to maintain a sophisticated casual vibe. Consider minimalist accessories to complete the refined look.",
             "itemDetails": [
-                {
-                    "id": 38,
-                    "name": "Light Gray Blouse",
-                    "brand": "Erigo",
-                    "category": "Tops",
-                    "color": "Light Gray",
-                    "size": "M",
-                    "image_url": "https://picsum.photos/400?random=4",
-                    "notes": "Work polo shirt"
-                },
-                {
-                    "id": 5,
-                    "name": "Navy Blue Jeans",
-                    "brand": "Levi's",
-                    "category": "Bottoms",
-                    "color": "Navy Blue",
-                    "size": "34",
-                    "image_url": "https://picsum.photos/400?random=5",
-                    "notes": "Classic blue jeans"
-                },
-                {
-                    "id": 34,
-                    "name": "Navy Blue Blazer",
-                    "brand": "Lacoste",
-                    "category": "Outerwear",
-                    "color": "Navy Blue",
-                    "size": "L",
-                    "image_url": "https://picsum.photos/400?random=20",
-                    "notes": "Navy blue blazer for presentations"
-                },
-                {
-                    "id": 6,
-                    "name": "Black Sneakers",
-                    "brand": "This Is April",
-                    "category": "Footwear",
-                    "color": "Black",
-                    "size": "43",
-                    "image_url": "https://picsum.photos/400?random=6",
-                    "notes": "Formal dress shoes"
-                }
+              {
+                "id": 38,
+                "name": "Light Gray Blouse",
+                "brand": "Erigo",
+                "category": "Tops",
+                "color": "Light Gray",
+                "size": "M",
+                "image_url": "https://picsum.photos/400?random=4",
+                "notes": "Work polo shirt"
+              },
+              {
+                "id": 5,
+                "name": "Navy Blue Jeans",
+                "brand": "Levi's",
+                "category": "Bottoms",
+                "color": "Navy Blue",
+                "size": "34",
+                "image_url": "https://picsum.photos/400?random=5",
+                "notes": "Classic blue jeans"
+              },
+              {
+                "id": 34,
+                "name": "Navy Blue Blazer",
+                "brand": "Lacoste",
+                "category": "Outerwear",
+                "color": "Navy Blue",
+                "size": "L",
+                "image_url": "https://picsum.photos/400?random=20",
+                "notes": "Navy blue blazer for presentations"
+              },
+              {
+                "id": 6,
+                "name": "Black Sneakers",
+                "brand": "This Is April",
+                "category": "Footwear",
+                "color": "Black",
+                "size": "43",
+                "image_url": "https://picsum.photos/400?random=6",
+                "notes": "Formal dress shoes"
+              }
             ]
-        },
-        {
+          },
+          {
             "outfit_name": "Polished Charm",
             "items": [
-                4,
-                5,
-                34,
-                20
+              4,
+              5,
+              34,
+              20
             ],
             "description": "A fresh and confident choice, this outfit pairs a crisp white polo shirt with navy blue jeans. The addition of the navy blazer instantly transforms this business-casual staple into a stylish date night ensemble. It's a clean, classic, and put-together look that is both approachable and refined, suitable for a mild evening.",
             "style_tips": "For a 'romantic and stylish' feel, ensure the polo is well-fitted and possibly worn untucked if it's a shorter cut, or a neat half-tuck. Layer the blazer over the polo for an intelligent, refined appearance. The black leather sneakers, despite their 'formal' tag, can lend a modern, smart-casual edge if kept pristine. Add a belt that complements the sneakers for cohesion.",
             "itemDetails": [
-                {
-                    "id": 4,
-                    "name": "White Polo Shirt",
-                    "brand": "Polo Ralph Lauren",
-                    "category": "Tops",
-                    "color": "White",
-                    "size": "L",
-                    "image_url": "https://picsum.photos/400?random=4",
-                    "notes": "Work polo shirt"
-                },
-                {
-                    "id": 5,
-                    "name": "Navy Blue Jeans",
-                    "brand": "Levi's",
-                    "category": "Bottoms",
-                    "color": "Navy Blue",
-                    "size": "34",
-                    "image_url": "https://picsum.photos/400?random=5",
-                    "notes": "Classic blue jeans"
-                },
-                {
-                    "id": 34,
-                    "name": "Navy Blue Blazer",
-                    "brand": "Lacoste",
-                    "category": "Outerwear",
-                    "color": "Navy Blue",
-                    "size": "L",
-                    "image_url": "https://picsum.photos/400?random=20",
-                    "notes": "Navy blue blazer for presentations"
-                },
-                {
-                    "id": 20,
-                    "name": "Black Sneakers",
-                    "brand": "This Is April",
-                    "category": "Footwear",
-                    "color": "Black",
-                    "size": "43",
-                    "image_url": "https://picsum.photos/400?random=6",
-                    "notes": "Formal dress shoes"
-                }
+              {
+                "id": 4,
+                "name": "White Polo Shirt",
+                "brand": "Polo Ralph Lauren",
+                "category": "Tops",
+                "color": "White",
+                "size": "L",
+                "image_url": "https://picsum.photos/400?random=4",
+                "notes": "Work polo shirt"
+              },
+              {
+                "id": 5,
+                "name": "Navy Blue Jeans",
+                "brand": "Levi's",
+                "category": "Bottoms",
+                "color": "Navy Blue",
+                "size": "34",
+                "image_url": "https://picsum.photos/400?random=5",
+                "notes": "Classic blue jeans"
+              },
+              {
+                "id": 34,
+                "name": "Navy Blue Blazer",
+                "brand": "Lacoste",
+                "category": "Outerwear",
+                "color": "Navy Blue",
+                "size": "L",
+                "image_url": "https://picsum.photos/400?random=20",
+                "notes": "Navy blue blazer for presentations"
+              },
+              {
+                "id": 20,
+                "name": "Black Sneakers",
+                "brand": "This Is April",
+                "category": "Footwear",
+                "color": "Black",
+                "size": "43",
+                "image_url": "https://picsum.photos/400?random=6",
+                "notes": "Formal dress shoes"
+              }
             ]
-        },
-        {
+          },
+          {
             "outfit_name": "Modern Romantic",
             "items": [
-                40,
-                5,
-                34,
-                6
+              40,
+              5,
+              34,
+              6
             ],
             "description": "This look focuses on a striking red sweater, a color often associated with romance, paired with classic navy jeans. The unusual 'leather' material of the sweater, if sleek, adds an edgy and luxurious texture, making it uniquely stylish. Layering the navy blazer over the sweater provides structure, warmth, and a sophisticated contrast, ideal for a mild evening date.",
             "style_tips": "Let the red sweater be the focal point of this outfit. Depending on the sweater's cut, you might wear it slightly oversized for a cozy-chic feel, or fitted for a sharper look. If the 'leather' material is substantial, ensure the blazer fits comfortably over it. The black sneakers ground the vibrant top, creating a balanced and modern aesthetic. Keep accessories minimal to let the rich color and texture shine.",
             "itemDetails": [
-                {
-                    "id": 40,
-                    "name": "Red Sweater",
-                    "brand": "Greenlight",
-                    "category": "Tops",
-                    "color": "Red",
-                    "size": "43",
-                    "image_url": "https://picsum.photos/400?random=6",
-                    "notes": "Formal dress shoes"
-                },
-                {
-                    "id": 5,
-                    "name": "Navy Blue Jeans",
-                    "brand": "Levi's",
-                    "category": "Bottoms",
-                    "color": "Navy Blue",
-                    "size": "34",
-                    "image_url": "https://picsum.photos/400?random=5",
-                    "notes": "Classic blue jeans"
-                },
-                {
-                    "id": 34,
-                    "name": "Navy Blue Blazer",
-                    "brand": "Lacoste",
-                    "category": "Outerwear",
-                    "color": "Navy Blue",
-                    "size": "L",
-                    "image_url": "https://picsum.photos/400?random=20",
-                    "notes": "Navy blue blazer for presentations"
-                },
-                {
-                    "id": 6,
-                    "name": "Black Sneakers",
-                    "brand": "This Is April",
-                    "category": "Footwear",
-                    "color": "Black",
-                    "size": "43",
-                    "image_url": "https://picsum.photos/400?random=6",
-                    "notes": "Formal dress shoes"
-                }
+              {
+                "id": 40,
+                "name": "Red Sweater",
+                "brand": "Greenlight",
+                "category": "Tops",
+                "color": "Red",
+                "size": "43",
+                "image_url": "https://picsum.photos/400?random=6",
+                "notes": "Formal dress shoes"
+              },
+              {
+                "id": 5,
+                "name": "Navy Blue Jeans",
+                "brand": "Levi's",
+                "category": "Bottoms",
+                "color": "Navy Blue",
+                "size": "34",
+                "image_url": "https://picsum.photos/400?random=5",
+                "notes": "Classic blue jeans"
+              },
+              {
+                "id": 34,
+                "name": "Navy Blue Blazer",
+                "brand": "Lacoste",
+                "category": "Outerwear",
+                "color": "Navy Blue",
+                "size": "L",
+                "image_url": "https://picsum.photos/400?random=20",
+                "notes": "Navy blue blazer for presentations"
+              },
+              {
+                "id": 6,
+                "name": "Black Sneakers",
+                "brand": "This Is April",
+                "category": "Footwear",
+                "color": "Black",
+                "size": "43",
+                "image_url": "https://picsum.photos/400?random=6",
+                "notes": "Formal dress shoes"
+              }
             ]
-        }
-    ],
-    "wardrobeSize": 11
-});
+          }
+        ],
+        "wardrobeSize": 11
+      });
     } catch (error) {
       console.log(error);
       res.status(500).json({ error: error.message });
     }
   }
+
+
 }
 
 module.exports = Clothing;

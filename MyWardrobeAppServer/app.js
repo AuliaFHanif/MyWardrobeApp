@@ -9,7 +9,8 @@ const Color = require('./controllers/ColorController.js');
 const Types = require('./controllers/TypeController.js');
 const authentication = require('./middlewares/authentication.js')
 const verifyRole = require('./middlewares/authorization.js')
-const errorHandler = require('./middlewares/errorHandler.js')
+const errorHandler = require('./middlewares/errorHandler.js');
+const ColorController = require('./controllers/ColorController.js');
 
 const app = express();
 
@@ -35,7 +36,7 @@ app.use(authentication)
 app.post('/add-user', verifyRole, Users.createUser)
 
 app.get('/clothing', Clothing.getClothingItemPersonal);
-app.get('/clothing/suggestions', Clothing.getOutfitSuggestions);
+app.post('/clothing/suggestions', Clothing.getOutfitSuggestions);
 app.get('/clothing/suggestionsDummy', Clothing.getOutfitSuggestionsDummy);
 app.post('/clothing/add', Clothing.addClothingItem);
 app.put('/clothing/:id', verifyRole, Clothing.editClothingItem);
