@@ -1,0 +1,42 @@
+[
+    {
+      "occasion_name": "Casual",
+      "description": "Everyday wear, relaxed and comfortable"
+    },
+    {
+      "occasion_name": "Formal",
+      "description": "Black tie events, galas, weddings"
+    },
+    {
+      "occasion_name": "Business",
+      "description": "Office wear, professional meetings"
+    },
+    {
+      "occasion_name": "Business Casual",
+      "description": "Smart casual office attire"
+    },
+    {
+      "occasion_name": "Party",
+      "description": "Social gatherings, celebrations"
+    },
+    {
+      "occasion_name": "Date Night",
+      "description": "Romantic dinners and outings"
+    },
+    {
+      "occasion_name": "Athletic",
+      "description": "Gym, sports, workout activities"
+    },
+    {
+      "occasion_name": "Outdoor",
+      "description": "Hiking, camping, outdoor activities"
+    },
+    {
+      "occasion_name": "Beach",
+      "description": "Beach wear, swimwear, resort casual"
+    },
+    {
+      "occasion_name": "Lounge",
+      "description": "Home wear, pajamas, comfortable indoor clothing"
+    }
+  ]
