@@ -1,7 +1,12 @@
-const { hashPassword, comparePassword } = require('../helpers/bcrypt');
-const bcrypt = require('bcrypt');
+const { hashPassword, comparePassword } = require('../../helpers/bcrypt');
 
-jest.mock('bcrypt');
+jest.mock('bcrypt', () => ({
+    genSaltSync: jest.fn(),
+    hashSync: jest.fn(),
+    compareSync: jest.fn()
+}));
+
+const bcrypt = require('bcrypt');
 
 describe('bcrypt helpers', () => {
     beforeEach(() => {

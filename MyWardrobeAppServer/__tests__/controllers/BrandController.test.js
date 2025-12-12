@@ -1,7 +1,13 @@
-const BrandController = require('.../controllers/BrandController');
-const { Brand } = require('.../models');
+const BrandController = require('../../controllers/BrandController');
 
-jest.mock('../models');
+// Mock the models module
+jest.mock('../../models', () => ({
+    Brand: {
+        findAll: jest.fn()
+    }
+}));
+
+const { Brand } = require('../../models');
 
 describe('BrandController', () => {
     let req, res, next;

@@ -1,37 +1,37 @@
 [
-    {
-      "email": "admin@wardrobe.com",
-      "password_hash": "qwerty",
-      "first_name": "Admin",
-      "last_name": "User",
-      "role": "Admin"
-    },
-    {
-      "email": "mom@wardrobe.com",
-      "password_hash": "qwerty",
-      "first_name": "Mom",
-      "last_name": "Family",
-      "role": "familyMember"
-    },
-    {
-      "email": "dad@wardrobe.com",
-      "password_hash": "qwerty",
-      "first_name": "Dad",
-      "last_name": "Family",
-      "role": "familyMember"
-    },
-    {
-      "email": "sister@wardrobe.com",
-      "password_hash": "qwerty",
-      "first_name": "Sister",
-      "last_name": "Family",
-      "role": "familyMember"
-    },
-    {
-      "email": "brother@wardrobe.com",
-      "password_hash": "qwerty",
-      "first_name": "Brother",
-      "last_name": "Family",
-      "role": "familyMember"
-    }
-  ]
+  {
+    "email": "admin@wardrobe.com",
+    "password_hash": "qwerty",
+    "first_name": "Admin",
+    "last_name": "User",
+    "role": "Admin"
+  },
+  {
+    "email": "mom@wardrobe.com",
+    "password_hash": "qwerty",
+    "first_name": "Mom",
+    "last_name": "Family",
+    "role": "familyMember"
+  },
+  {
+    "email": "dad@wardrobe.com",
+    "password_hash": "qwerty",
+    "first_name": "Dad",
+    "last_name": "Family",
+    "role": "familyMember"
+  },
+  {
+    "email": "sister@wardrobe.com",
+    "password_hash": "qwerty",
+    "first_name": "Sister",
+    "last_name": "Family",
+    "role": "familyMember"
+  },
+  {
+    "email": "brother@wardrobe.com",
+    "password_hash": "qwerty",
+    "first_name": "Brother",
+    "last_name": "Family",
+    "role": "familyMember"
+  }
+]

@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const {User} = require('../models');
+const { User } = require('../models');
 
 module.exports = {
   async up(queryInterface, Sequelize) {
@@ -32,7 +32,7 @@ module.exports = {
 
       // Add timestamps to each record
       const now = new Date();
-      
+
       const usersWithTimestamps = users.map(item => ({
         ...item,
         created_at: now,
@@ -76,8 +76,8 @@ module.exports = {
       }));
 
       // Bulk insert data in correct order (respecting foreign keys)
-      await User.bulkCreate(usersWithTimestamps, {individualHooks: true});
-      console.log('✅ Seeded Users');
+      // await User.bulkCreate(usersWithTimestamps, { individualHooks: true });
+      // console.log('✅ Seeded Users');
 
       await queryInterface.bulkInsert('Brands', brandsWithTimestamps, {});
       console.log('✅ Seeded Brands');

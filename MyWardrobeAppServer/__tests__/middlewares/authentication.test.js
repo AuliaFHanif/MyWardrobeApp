@@ -1,9 +1,17 @@
-const authentication = require('../middlewares/authentication');
-const { verifyToken } = require('../helpers/jwt');
-const { User } = require('../models');
+const authentication = require('../../middlewares/authentication');
 
-jest.mock('../helpers/jwt');
-jest.mock('../models');
+jest.mock('../../helpers/jwt', () => ({
+    verifyToken: jest.fn()
+}));
+
+jest.mock('../../models', () => ({
+    User: {
+        findByPk: jest.fn()
+    }
+}));
+
+const { verifyToken } = require('../../helpers/jwt');
+const { User } = require('../../models');
 
 describe('authentication middleware', () => {
     let req, res, next;

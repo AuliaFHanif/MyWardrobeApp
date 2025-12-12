@@ -1,7 +1,12 @@
-const ColorController = require('../controllers/ColorController');
-const { Color } = require('../models');
+const ColorController = require('../../controllers/ColorController');
 
-jest.mock('../models');
+jest.mock('../../models', () => ({
+    Color: {
+        findAll: jest.fn()
+    }
+}));
+
+const { Color } = require('../../models');
 
 describe('ColorController', () => {
     let req, res, next;

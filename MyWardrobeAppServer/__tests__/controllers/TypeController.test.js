@@ -1,7 +1,12 @@
-const Types = require('../controllers/TypeController');
-const { ClothingType } = require('../models');
+const Types = require('../../controllers/TypeController');
 
-jest.mock('../models');
+jest.mock('../../models', () => ({
+    ClothingType: {
+        findAll: jest.fn()
+    }
+}));
+
+const { ClothingType } = require('../../models');
 
 describe('TypeController', () => {
     let req, res, next;

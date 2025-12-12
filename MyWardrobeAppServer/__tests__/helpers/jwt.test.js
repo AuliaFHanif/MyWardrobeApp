@@ -1,7 +1,11 @@
-const { signToken, verifyToken } = require('../helpers/jwt');
-const jwt = require('jsonwebtoken');
+const { signToken, verifyToken } = require('../../helpers/jwt');
 
-jest.mock('jsonwebtoken');
+jest.mock('jsonwebtoken', () => ({
+    sign: jest.fn(),
+    verify: jest.fn()
+}));
+
+const jwt = require('jsonwebtoken');
 
 describe('jwt helpers', () => {
     beforeEach(() => {
