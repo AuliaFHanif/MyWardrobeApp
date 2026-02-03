@@ -14,7 +14,10 @@ const ColorController = require('./controllers/ColorController.js');
 
 const app = express();
 
-app.use(cors())
+app.use(cors({
+  origin: 'https://mywardrobeappclient.web.app',
+  credentials: true
+}))
 
 const storage = multer.memoryStorage()
 const upload = multer({ storage: storage })

@@ -76,8 +76,8 @@ module.exports = {
       }));
 
       // Bulk insert data in correct order (respecting foreign keys)
-      // await User.bulkCreate(usersWithTimestamps, { individualHooks: true });
-      // console.log('✅ Seeded Users');
+      await User.bulkCreate(usersWithTimestamps, { individualHooks: true });
+      console.log('✅ Seeded Users');
 
       await queryInterface.bulkInsert('Brands', brandsWithTimestamps, {});
       console.log('✅ Seeded Brands');
